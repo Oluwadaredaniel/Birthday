@@ -1,562 +1,224 @@
-/* ========================================
-  CINEMATIC DESIGN FRAMEWORK
-  A Story of You - Immersive Birthday Experience
-  ========================================
-*/
-
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Inter:wght@100;200;300;400;500&family=Dancing+Script:wght@400;500;600;700&display=swap');
-
+/* ==========================================================================
+   1. VARIABLES & RESET
+   ========================================================================== */
 :root {
-  /* Core Aesthetics */
+  /* Colors */
   --bg-color: #05010a;
   --text-primary: #f8fafc;
-  --text-dim: rgba(248, 250, 252, 0.45);
   --accent-color: #fbbf24;
-  --accent-glow: rgba(251, 191, 36, 0.35);
-  
-  /* Materials & Glass */
   --glass-bg: rgba(255, 255, 255, 0.025);
   --glass-border: rgba(255, 255, 255, 0.08);
   
-  /* Typography Scale */
+  /* Gradients for "Colorful" request */
+  --grad-warm: linear-gradient(135deg, #ff6b6b, #feb47b);
+  --grad-vibrant: linear-gradient(135deg, #f093fb, #f5576c);
+  --grad-cool: linear-gradient(135deg, #6a11cb, #2575fc);
+
+  /* Typography */
   --font-serif: 'Cormorant Garamond', serif;
   --font-sans: 'Inter', sans-serif;
-  --font-cursive: 'Dancing Script', cursive;
-  
-  /* Motion Logic */
-  --transition-ultra-slow: 2.2s cubic-bezier(0.23, 1, 0.32, 1);
-  --transition-slow: 1.8s cubic-bezier(0.23, 1, 0.32, 1);
-  --transition-mid: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-cinematic: cubic-bezier(0.23, 1, 0.32, 1);
-  
-  /* Spacing */
-  --padding-standard: 2rem;
-  --padding-cinematic: 6rem;
+  --font-mla: "Times New Roman", Times, serif;
 }
-
-/* ========================================
-  GLOBAL ARCHITECTURE
-  ========================================
-*/
 
 * { 
   margin: 0; 
   padding: 0; 
   box-sizing: border-box; 
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
+  outline: none; 
+  -webkit-tap-highlight-color: transparent; 
 }
 
-body, html {
-  width: 100%;
-  height: 100%;
-  background-color: var(--bg-color);
-  color: var(--text-primary);
-  font-family: var(--font-sans);
-  overflow: hidden;
-  user-select: none;
-  -webkit-font-smoothing: antialiased;
+body, html { 
+  width: 100%; 
+  height: 100%; 
+  background: var(--bg-color); 
+  color: var(--text-primary); 
+  font-family: var(--font-sans); 
+  overflow: hidden; 
+  -webkit-font-smoothing: antialiased; 
 }
 
-/* Background Layers */
-canvas#ambient-canvas {
-  position: fixed;
-  inset: 0;
-  width: 100%; height: 100%;
-  z-index: -5;
-  pointer-events: none;
-}
-
-#balloon-container {
-  position: fixed;
-  inset: 0;
-  width: 100%; height: 100%;
-  z-index: -4;
-  pointer-events: none;
-}
-
-/* ========================================
-  SCENE SYSTEM
-  ========================================
-*/
+/* ==========================================================================
+   2. GLOBAL LAYOUT & UTILITIES
+   ========================================================================== */
+canvas#ambient-canvas { position: fixed; inset: 0; z-index: -5; pointer-events: none; }
+#balloon-container { position: fixed; inset: 0; z-index: -4; pointer-events: none; }
 
 .scene {
-  display: none;
-  width: 100%; height: 100vh;
-  position: absolute; top: 0; left: 0;
-  opacity: 0;
-  transform: scale(1.08) translateY(10px);
-  filter: blur(15px);
-  transition: opacity var(--transition-slow), transform var(--transition-slow), filter var(--transition-slow);
-}
-
-.scene.active {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.scene.visible {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-  filter: blur(0);
-}
-
-/* ========================================
-  SCENE: LOADING
-  ========================================
-*/
-
-#scene-loading { 
-  z-index: 10000; 
-  flex-direction: column; 
-  background: var(--bg-color); 
-}
-
-.loader-wrap { 
-  width: 320px; 
-  text-align: center; 
-}
-
-.loader-bar-bg { 
-  height: 2px; 
+  display: none; 
   width: 100%; 
-  background: rgba(255,255,255,0.03); 
-  position: relative; 
-  overflow: hidden; 
-  border-radius: 4px;
-}
-
-.loader-bar { 
-  height: 100%; 
-  width: 0%; 
-  background: var(--accent-color); 
-  box-shadow: 0 0 15px var(--accent-glow); 
-  transition: width 0.4s ease-out; 
-}
-
-.loader-text { 
-  margin-top: 2rem; 
-  font-size: 0.65rem; 
-  letter-spacing: 0.65em; 
-  text-transform: uppercase; 
-  opacity: 0.4; 
-  font-weight: 200;
-  animation: textFlicker 4s infinite;
-}
-
-@keyframes textFlicker {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.2; }
-}
-
-/* ========================================
-  SCENE: THE VAULT (HYPER-REALISTIC)
-  ========================================
-*/
-
-.focus-overlay {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
-  z-index: 20;
-  display: flex;
-  align-items: center;
+  height: 100vh; 
+  position: absolute; 
+  top: 0; left: 0;
+  opacity: 0; 
+  transform: scale(1.05); 
+  filter: blur(15px);
+  transition: opacity 1.5s ease, transform 1.5s ease, filter 1.5s ease;
+  flex-direction: column; 
+  align-items: center; 
   justify-content: center;
-  cursor: pointer;
 }
 
-.focus-prompt { 
-  text-align: center; 
-  animation: focusBreath 4s infinite ease-in-out; 
-  pointer-events: none;
-}
+.scene.active { display: flex; }
+.scene.visible { opacity: 1; transform: scale(1); filter: blur(0); }
 
-.focus-icon { 
-  font-size: 3rem; 
-  color: var(--accent-color); 
-  display: block; 
-  margin-bottom: 1.5rem; 
-}
+.serif { font-family: var(--font-serif); }
+.italic { font-style: italic; }
 
-.focus-text { 
-  letter-spacing: 0.35em; 
-  text-transform: uppercase; 
-  font-size: 0.8rem; 
-  opacity: 0.8; 
-  font-weight: 200; 
-}
+/* ==========================================================================
+   3. COMPONENTS
+   ========================================================================== */
 
-.focus-subtext {
-  font-size: 0.6rem;
-  letter-spacing: 0.2em;
-  opacity: 0.4;
-  margin-top: 0.5rem;
-}
-
-@keyframes focusBreath {
-  0%, 100% { opacity: 0.4; transform: scale(0.98); filter: blur(1px); }
-  50% { opacity: 1; transform: scale(1.02); filter: blur(0); }
-}
-
-.vault-stage { 
-  position: relative; 
-  width: 100%; height: 100%; 
-  perspective: 3500px; 
-  display: flex; align-items: center; justify-content: center; 
-}
-
-.bank-vault { 
-  width: clamp(300px, 45vw, 500px); 
-  aspect-ratio: 1/1; 
-  z-index: 5; 
-  transition: transform 1s var(--ease-cinematic);
-}
-
+/* Vault Mechanism */
+.vault-stage { perspective: 2500px; }
 .vault-frame { 
-  width: 100%; height: 100%; 
+  width: 320px; height: 320px; 
   background: #0d0d0f; 
-  border: 14px solid #050505; 
-  border-radius: 20px; 
-  box-shadow: inset 0 0 100px #000, 0 40px 120px rgba(0,0,0,0.95); 
+  border: 12px solid #050505; 
+  border-radius: 15px; 
   position: relative; 
-  overflow: visible;
+  box-shadow: 0 50px 100px rgba(0,0,0,0.8); 
 }
 
 .vault-door { 
-  width: calc(100% - 10px); height: calc(100% - 10px); 
-  background: #111;
-  border: 1px solid #333; 
-  border-radius: 6px; 
-  position: absolute; top: 5px; left: 5px; 
-  transition: transform 4.5s cubic-bezier(0.5, 0, 0.1, 1); 
-  transform-origin: left center; 
+  width: 100%; height: 100%; 
+  background: #111; 
+  position: absolute; 
+  transform-origin: left; 
+  transition: 4s cubic-bezier(0.4, 0, 0.2, 1); 
   z-index: 10; 
-  display: flex; align-items: center; justify-content: center; 
-  overflow: hidden;
-  box-shadow: 15px 0 40px rgba(0,0,0,0.6);
-}
-
-.vault-door-image {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  filter: brightness(0.6) contrast(1.2);
-  transition: filter 2s;
-}
-
-.vault-door:hover .vault-door-image {
-  filter: brightness(0.8) contrast(1.1);
-}
-
-.vault-door-face {
-  width: 100%; height: 100%;
-  position: relative;
-  display: flex; align-items: center; justify-content: center;
-  z-index: 2;
+  border-left: 2px solid #333; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
 }
 
 .vault-wheel { 
-  width: 45%; height: 45%; 
-  border: 12px solid rgba(255,255,255,0.1); 
+  width: 140px; height: 140px; 
+  border: 10px solid #222; 
   border-radius: 50%; 
   position: relative; 
-  transition: transform 5s cubic-bezier(0.6, 0, 0.1, 1); 
-  box-shadow: 0 0 40px rgba(0,0,0,0.8), inset 0 0 30px #000;
-  backdrop-filter: blur(2px);
+  transition: 3s ease; 
 }
 
 .wheel-spoke { 
-  width: 130%; height: 10px; 
-  background: rgba(255,255,255,0.08); 
-  position: absolute; top: 50%; left: -15%; 
-  transform: translateY(-50%); 
-  border-radius: 5px; 
-}
-
-.wheel-spoke:nth-child(2) { transform: translateY(-50%) rotate(60deg); }
-.wheel-spoke:nth-child(3) { transform: translateY(-50%) rotate(120deg); }
-
-.wheel-center { 
-  width: 50px; height: 50px; 
-  background: #000; 
-  border: 4px solid #333; 
-  border-radius: 50%; 
-  position: absolute; top: 50%; left: 50%; 
-  transform: translate(-50%, -50%); 
-  box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
-}
-
-.vault-interior-glow { 
-  position: absolute; inset: 0; 
-  background: radial-gradient(circle at center, var(--accent-glow) 0%, transparent 85%); 
-  opacity: 0; transition: opacity 3.5s ease-out; pointer-events: none; 
-}
-
-/* ========================================
-  HYPER-REALISTIC CHARACTER GUIDE
-  ========================================
-*/
-
-.hero-character { 
+  width: 120%; height: 4px; 
+  background: #1a1a1a; 
   position: absolute; 
-  bottom: 12%; left: -300px; 
-  z-index: 50; 
-  transition: left 4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 1.5s; 
+  top: 50%; left: -10%; 
 }
 
-.hero-character.hidden { opacity: 0; pointer-events: none; }
-
-.realistic-chibi {
-  width: 160px;
-  height: 240px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.8));
-  animation: floatRealistic 4s infinite ease-in-out;
-}
-
-.realistic-chibi img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-@keyframes floatRealistic {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-15px) rotate(2deg); }
-}
-
-/* ========================================
-  SCENE: NARRATIVE INTRO (Typewriter Fixes)
-  ========================================
-*/
-
-#scene-intro {
-    flex-direction: column;
-    padding: var(--padding-cinematic) var(--padding-standard);
-    background: radial-gradient(circle at center, #0f0a1a 0%, #05010a 100%);
-}
-
-#intro-text {
-    font-family: var(--font-serif);
-    font-size: clamp(1.4rem, 5vw, 2.5rem);
-    line-height: 1.6;
-    color: var(--text-primary);
-    text-align: center;
-    max-width: 850px;
-    margin: 0 auto;
-    
-    /* IMPROVEMENT: Spacing Logic */
-    letter-spacing: 0.08em; 
-    word-spacing: 0.25em;
-    white-space: pre-wrap; /* Essential to keep spaces during typewriter */
-    display: block;
-    min-height: 4.5em; /* Prevents scene layout shifts */
-    
-    font-style: italic;
-    font-weight: 300;
-}
-
-/* ========================================
-  SCENE: MOSAIC COLLAGE
-  ========================================
-*/
-
-#scene-overview { 
-  flex-direction: column; 
-  padding: var(--padding-cinematic) var(--padding-standard) 0; 
-  justify-content: flex-start; 
-  overflow-y: auto; 
-  scrollbar-width: none;
-}
-
-#scene-overview::-webkit-scrollbar { display: none; }
-
-.overview-header { 
+/* Story Cards & Narratives */
+.story-card {
+  max-width: 650px; 
+  padding: 4rem; 
+  background: var(--glass-bg); 
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border); 
+  border-radius: 4px; 
   text-align: center; 
-  margin-bottom: 5rem;
-  max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
+  cursor: pointer;
+  position: relative;
 }
 
-.overview-header h2 { 
+.story-card h2 { 
   font-family: var(--font-serif); 
-  font-size: clamp(2.5rem, 6vw, 4.5rem); 
+  font-size: 2.5rem; 
+  margin-bottom: 1rem; 
+  color: var(--accent-color); 
+}
+
+.story-card p { 
+  font-size: 1.15rem; 
+  line-height: 1.8; 
   margin-bottom: 1.5rem; 
   font-weight: 300; 
-  font-style: italic;
-  color: var(--accent-color);
+  color: rgba(255,255,255,0.9);
 }
 
-.overview-header .subtitle { 
-  font-size: 0.8rem; 
-  opacity: 0.35; 
-  text-transform: uppercase; 
-  letter-spacing: 0.6em; 
+/* MLA Formatting (Strict 12pt Standard) */
+.mla-letter {
+  background: #ffffff; 
+  color: #000000; 
+  padding: 1in; 
+  font-family: var(--font-mla);
+  font-size: 12pt; 
+  line-height: 2.0; 
+  text-align: left; 
+  width: 100%; 
+  max-width: 800px;
+  height: 85vh; 
+  overflow-y: auto; 
+  box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+  margin: auto;
 }
 
+.mla-header { margin-bottom: 24pt; }
+.mla-body { text-indent: 0.5in; }
+
+/* Mosaic & Gallery */
 .mood-collage { 
   display: grid; 
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); 
-  grid-auto-rows: 400px; 
-  gap: 1.8rem; 
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+  gap: 1.5rem; 
   width: 100%; 
-  max-width: 1500px; 
-  margin: 0 auto;
-  padding-bottom: 12rem;
+  max-width: 1400px; 
+  padding: 2rem; 
 }
 
 .mood-tile { 
-  position: relative;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border); 
+  aspect-ratio: 1; 
+  border-radius: 4px; 
   overflow: hidden; 
   opacity: 0; 
-  transform: translateY(100px) scale(0.94);
-  transition: opacity 1.6s var(--ease-cinematic), transform 1.6s var(--ease-cinematic), border-color 0.5s;
-  cursor: pointer;
-  border-radius: 4px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+  transform: translateY(30px); 
+  transition: 1s cubic-bezier(0.2, 1, 0.3, 1); 
+  cursor: pointer; 
 }
 
-.mood-tile.spill-active { opacity: 1; transform: translateY(0) scale(1); }
-.mood-tile img { 
-  width: 100%; height: 100%; 
-  object-fit: cover; 
-  opacity: 0.8; 
-  transition: transform 2.2s var(--ease-cinematic), opacity 0.8s ease; 
+.mood-tile.spill-active { opacity: 1; transform: translateY(0); }
+
+.memory-slide { 
+  flex: 0 0 70vw; 
+  height: 75vh; 
+  scroll-snap-align: center; 
+  display: flex; 
+  flex-direction: column;
+  align-items: center; 
+  justify-content: center; 
 }
 
-.mood-tile:hover img { 
-  opacity: 1; 
-  transform: scale(1.08); 
+.hidden-line { 
+  margin-top: 1.5rem; 
+  font-family: var(--font-serif); 
+  font-style: italic; 
+  color: var(--accent-color); 
+  font-size: 1.3rem; 
+  opacity: 0.8;
 }
 
-.letter-tile {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: var(--accent-color);
-    font-family: var(--font-cursive);
-    font-size: 1.5rem;
-    text-align: center;
-    padding: 2rem;
+/* ==========================================================================
+   4. ANIMATIONS & EFFECTS
+   ========================================================================= */
+@keyframes floatUp { 
+  from { transform: translateY(10vh) rotate(0deg); opacity: 0; }
+  to { transform: translateY(-120vh) rotate(360deg); opacity: 0.6; }
 }
 
-/* ========================================
-  SCENE: DEEP GALLERY
-  ========================================
-*/
-
-#scene-gallery { 
-  background: radial-gradient(circle at 50% 50%, #110a1f 0%, #05010a 100%);
-  z-index: 1000;
+.balloon { 
+  position: absolute; 
+  bottom: -50px; 
+  width: 20px; 
+  height: 28px; 
+  border-radius: 50%; 
+  animation: floatUp 18s linear infinite; 
 }
 
-.horizontal-track { 
-  flex: 1; display: flex; overflow-x: auto; 
-  padding: 0 22vw; gap: 10vw; align-items: center; 
-  scrollbar-width: none; scroll-snap-type: x mandatory;
-}
-
-.horizontal-track::-webkit-scrollbar { display: none; }
-
-.memory-slide {
-  flex: 0 0 62vw; height: 78vh; 
-  scroll-snap-align: center;
-  transition: transform 1.8s var(--transition-ultra-slow), opacity 1.8s var(--transition-ultra-slow), filter 1.8s var(--transition-ultra-slow);
-  filter: blur(25px) brightness(0.25); opacity: 0;
-  display: flex; align-items: center; justify-content: center;
-  position: relative;
-}
-
-.memory-slide.focused { filter: blur(0) brightness(1); opacity: 1; transform: scale(1.02); }
-
-.memory-slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain; 
-  border-radius: 4px;
-  box-shadow: 0 40px 120px rgba(0,0,0,0.85);
-}
-
-.envelope-slide {
-    background: #fdfcf0;
-    padding: 4rem;
-    max-width: 600px;
-    color: #2c2c2c;
-    border-radius: 2px;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-    position: relative;
-}
-
-.letter-text {
-    font-family: var(--font-serif);
-    font-size: 1.25rem;
-    line-height: 1.8;
-    margin-bottom: 2rem;
-}
-
-.wax-seal {
-    font-size: 2.5rem;
-    color: #b91c1c;
-    text-align: center;
-}
-
-/* ========================================
-  UI COMPONENTS
-  ========================================
-*/
-
-.nav-btn-close { 
-  position: fixed; top: 3.5rem; left: 3.5rem; z-index: 1001; 
-  background: none; border: none; color: white; cursor: pointer; 
-  opacity: 0.35; transition: 0.5s var(--ease-cinematic); 
-}
-
-.nav-btn-close:hover { opacity: 1; transform: rotate(90deg) scale(1.25); }
-
-.balloon {
-  position: absolute; bottom: -120px;
-  width: 25px; height: 32px; border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
-  animation: floatEthereal 40s linear infinite;
-  filter: blur(2px);
-  background: rgba(251, 191, 36, 0.05);
-}
-
-@keyframes floatEthereal {
-  0% { transform: translateY(0) rotate(0deg) translateX(0); opacity: 0; }
-  15% { opacity: 0.8; }
-  85% { opacity: 0.8; }
-  100% { transform: translateY(-120vh) rotate(45deg) translateX(60px); opacity: 0; }
-}
-
-.scroll-hint {
-  position: absolute; bottom: 3rem; left: 50%; transform: translateX(-50%);
-  display: flex; flex-direction: column; align-items: center; gap: 1rem;
-  opacity: 0.4; pointer-events: none;
-}
-
-.scroll-hint span { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.4em; }
-.hint-line { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--accent-color), transparent); }
-
-/* ========================================
-  RESPONSIVE LOGIC
-  ========================================
-*/
-
-@media (max-width: 600px) {
-  .nav-btn-close { top: 1.5rem; left: 1.5rem; }
-  .memory-slide { flex: 0 0 85vw; height: 55vh; }
-  .bank-vault { width: 85vw; }
-  .overview-header h2 { font-size: 2.2rem; }
-  .envelope-slide { padding: 2rem; margin: 1rem; }
-}
-
-/* END OF FRAMEWORK */
+/* ==========================================================================
+   5. MEDIA QUERIES
+   ========================================================================== */
+@media (max-width: 768px) {
+  .story-card { padding: 2rem; width: 90%; }
+  .mla-letter { padding: 0.5in; font-size: 11pt; }
+  .memory-slide { flex: 0 0 90vw; }
+    }
