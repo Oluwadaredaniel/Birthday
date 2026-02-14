@@ -118,14 +118,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // --- VAULT UNLOCK LOGIC (FIXED) ---
-  elements.focusOverlay.addEventListener('click', async () => {
+  // --- VAULT UNLOCK LOGIC (FIXED FOR MOBILE) ---
+  const unlockVaultAction = async (e) => {
+    if (e) e.preventDefault(); // Stop phantom clicks on mobile
     if (hasTransitioned) return;
     hasTransitioned = true;
 
-    // 1. Instantly hide the prompt and disable interference
-    elements.focusOverlay.style.opacity = '0';
-    elements.focusOverlay.style.pointerEvents = 'none';
+    // 1. Instantly remove blocking overlay layer
+    if (elements.focusOverlay) {
+        elements.focusOverlay.style.opacity = '0';
+        elements.focusOverlay.style.pointerEvents = 'none';
+        // Give a tiny moment for opacity before full removal
+        setTimeout(() => elements.focusOverlay.remove(), 300);
+    }
 
     // 2. Spin the wheel
     if (elements.vaultWheel) {
@@ -135,11 +140,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     await cinematicDelay(1000);
 
-    // 3. Swing the door with 3D depth
+    // 3. Swing the door with GPU acceleration (translateZ)
     if (elements.vaultDoor) {
-        elements.vaultDoor.style.transition = "transform 2s cubic-bezier(0.4, 0, 0.2, 1)";
-        elements.vaultDoor.style.transform = 'rotateY(-115deg)';
-        elements.vaultDoor.style.zIndex = "50"; 
+        elements.vaultDoor.style.transition = "transform 2.5s cubic-bezier(0.4, 0, 0.2, 1)";
+        elements.vaultDoor.style.transform = 'rotateY(-115deg) translateZ(1px)';
+        elements.vaultDoor.style.zIndex = "500"; 
     }
     
     if (elements.vaultGlow) {
@@ -148,6 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Bring character guide into view
     if (elements.heroGuide) {
+        elements.heroGuide.style.opacity = "1";
         elements.heroGuide.style.left = "40px";
     }
 
@@ -156,7 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // 4. Transition to Narrative Intro
     await transitionScene(elements.sceneLocked, elements.sceneIntro);
     
-    // Ensure phrases exist even if API fails
     const activePhrases = dynamicPhrases.length > 0 ? dynamicPhrases : [
         "A vault of every reason I love you.",
         "Fragments of light, and our shared time.",
@@ -165,7 +170,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     await runNarrativeEngine(elements.introText, activePhrases);
     await transitionScene(elements.sceneIntro, elements.sceneStory);
-  });
+  };
+
+  // Attach both touch and click for mobile reliability
+  if (elements.focusOverlay) {
+    elements.focusOverlay.addEventListener('touchstart', unlockVaultAction, {passive: false});
+    elements.focusOverlay.addEventListener('click', unlockVaultAction);
+  }
 
   // --- NAVIGATION ---
   if(elements.sceneStory) elements.sceneStory.onclick = () => transitionScene(elements.sceneStory, elements.sceneMeaning);
@@ -270,7 +281,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if(progress >= 100) clearInterval(loaderInt);
     }, 100);
 
-    // Run AI fetch but don't let it block the app start
     materializeAssets();
     
     setTimeout(() => transitionScene(elements.loader, elements.sceneLocked), 2000);
