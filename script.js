@@ -24,7 +24,12 @@ const MEMORY_REPOSITORY = [
   "https://ik.imagekit.io/kwujelxax/IMG-20260213-WA0009.jpg",
   "https://ik.imagekit.io/kwujelxax/IMG-20260213-WA0033.jpg",
   "https://ik.imagekit.io/kwujelxax/IMG-20260213-WA0028.jpg",
-  "https://ik.imagekit.io/kwujelxax/IMG-20260213-WA0013.jpg"
+  "https://ik.imagekit.io/kwujelxax/IMG-20260213-WA0013.jpg",
+  "https://ik.imagekit.io/kwujelxax/New%20Folder/IMG-20260213-WA0019.jpg",
+  "https://ik.imagekit.io/kwujelxax/New%20Folder/IMG-20260213-WA0037.jpg",
+  "https://ik.imagekit.io/kwujelxax/New%20Folder/IMG-20260213-WA0041.jpg",
+  "https://ik.imagekit.io/kwujelxax/New%20Folder/IMG-20260213-WA0042.jpg",
+  "https://ik.imagekit.io/kwujelxax/New%20Folder/IMG-20260213-WA0017.jpg",
 ];
 
 const ETERNAL_LETTER = {
@@ -280,3 +285,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function cinematicDelay(ms) { return new Promise(res => setTimeout(res, ms)); }
+
