@@ -1,5 +1,4 @@
-/* 
-  ========================================
+/* ========================================
   CINEMATIC DESIGN FRAMEWORK
   A Story of You - Immersive Birthday Experience
   ========================================
@@ -35,8 +34,7 @@
   --padding-cinematic: 6rem;
 }
 
-/* 
-  ========================================
+/* ========================================
   GLOBAL ARCHITECTURE
   ========================================
 */
@@ -77,8 +75,7 @@ canvas#ambient-canvas {
   pointer-events: none;
 }
 
-/* 
-  ========================================
+/* ========================================
   SCENE SYSTEM
   ========================================
 */
@@ -105,8 +102,7 @@ canvas#ambient-canvas {
   filter: blur(0);
 }
 
-/* 
-  ========================================
+/* ========================================
   SCENE: LOADING
   ========================================
 */
@@ -154,8 +150,7 @@ canvas#ambient-canvas {
   50% { opacity: 0.2; }
 }
 
-/* 
-  ========================================
+/* ========================================
   SCENE: THE VAULT (HYPER-REALISTIC)
   ========================================
 */
@@ -299,8 +294,7 @@ canvas#ambient-canvas {
   opacity: 0; transition: opacity 3.5s ease-out; pointer-events: none; 
 }
 
-/* 
-  ========================================
+/* ========================================
   HYPER-REALISTIC CHARACTER GUIDE
   ========================================
 */
@@ -335,8 +329,38 @@ canvas#ambient-canvas {
   50% { transform: translateY(-15px) rotate(2deg); }
 }
 
-/* 
+/* ========================================
+  SCENE: NARRATIVE INTRO (Typewriter Fixes)
   ========================================
+*/
+
+#scene-intro {
+    flex-direction: column;
+    padding: var(--padding-cinematic) var(--padding-standard);
+    background: radial-gradient(circle at center, #0f0a1a 0%, #05010a 100%);
+}
+
+#intro-text {
+    font-family: var(--font-serif);
+    font-size: clamp(1.4rem, 5vw, 2.5rem);
+    line-height: 1.6;
+    color: var(--text-primary);
+    text-align: center;
+    max-width: 850px;
+    margin: 0 auto;
+    
+    /* IMPROVEMENT: Spacing Logic */
+    letter-spacing: 0.08em; 
+    word-spacing: 0.25em;
+    white-space: pre-wrap; /* Essential to keep spaces during typewriter */
+    display: block;
+    min-height: 4.5em; /* Prevents scene layout shifts */
+    
+    font-style: italic;
+    font-weight: 300;
+}
+
+/* ========================================
   SCENE: MOSAIC COLLAGE
   ========================================
 */
@@ -412,8 +436,20 @@ canvas#ambient-canvas {
   transform: scale(1.08); 
 }
 
-/* 
-  ========================================
+.letter-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--accent-color);
+    font-family: var(--font-cursive);
+    font-size: 1.5rem;
+    text-align: center;
+    padding: 2rem;
+}
+
+/* ========================================
   SCENE: DEEP GALLERY
   ========================================
 */
@@ -450,8 +486,30 @@ canvas#ambient-canvas {
   box-shadow: 0 40px 120px rgba(0,0,0,0.85);
 }
 
-/* 
-  ========================================
+.envelope-slide {
+    background: #fdfcf0;
+    padding: 4rem;
+    max-width: 600px;
+    color: #2c2c2c;
+    border-radius: 2px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    position: relative;
+}
+
+.letter-text {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    line-height: 1.8;
+    margin-bottom: 2rem;
+}
+
+.wax-seal {
+    font-size: 2.5rem;
+    color: #b91c1c;
+    text-align: center;
+}
+
+/* ========================================
   UI COMPONENTS
   ========================================
 */
@@ -469,6 +527,7 @@ canvas#ambient-canvas {
   width: 25px; height: 32px; border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
   animation: floatEthereal 40s linear infinite;
   filter: blur(2px);
+  background: rgba(251, 191, 36, 0.05);
 }
 
 @keyframes floatEthereal {
@@ -487,8 +546,17 @@ canvas#ambient-canvas {
 .scroll-hint span { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.4em; }
 .hint-line { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--accent-color), transparent); }
 
+/* ========================================
+  RESPONSIVE LOGIC
+  ========================================
+*/
+
 @media (max-width: 600px) {
   .nav-btn-close { top: 1.5rem; left: 1.5rem; }
   .memory-slide { flex: 0 0 85vw; height: 55vh; }
   .bank-vault { width: 85vw; }
+  .overview-header h2 { font-size: 2.2rem; }
+  .envelope-slide { padding: 2rem; margin: 1rem; }
 }
+
+/* END OF FRAMEWORK */
