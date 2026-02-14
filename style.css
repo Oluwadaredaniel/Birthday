@@ -2,8 +2,7 @@
   CINEMATIC DESIGN FRAMEWORK
   A Story of You - Immersive Birthday Experience
   Updated with Janet's Custom Requests
-  ========================================
-*/
+  ======================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Inter:wght@100;200;300;400;500&family=Dancing+Script:wght@400;500;600;700&display=swap');
 
@@ -15,10 +14,12 @@
   --accent-color: #fbbf24;
   --accent-glow: rgba(251, 191, 36, 0.35);
   
-  /* Colorful Accents (New Request) */
+  /* Colorful Accents (Updated for Vibrancy) */
   --grad-warm: linear-gradient(135deg, #ff6b6b, #feb47b);
   --grad-vibrant: linear-gradient(135deg, #f093fb, #f5576c);
   --grad-cool: linear-gradient(135deg, #6a11cb, #2575fc);
+  --pink-soft: #fff0f5;
+  --pink-accent: #ffb6c1;
   
   /* Materials & Glass */
   --glass-bg: rgba(255, 255, 255, 0.025);
@@ -28,7 +29,7 @@
   --font-serif: 'Cormorant Garamond', serif;
   --font-sans: 'Inter', sans-serif;
   --font-cursive: 'Dancing Script', cursive;
-  --font-mla: "Times New Roman", Times, serif; /* New Request */
+  --font-mla: "Times New Roman", Times, serif; 
   
   /* Motion Logic */
   --transition-ultra-slow: 2.2s cubic-bezier(0.23, 1, 0.32, 1);
@@ -81,7 +82,7 @@ canvas#ambient-canvas {
 }
 
 /* ========================================
-  NEW: HEADER QUOTE BANNER
+  NEW: HEADER QUOTE BANNER (Updated: More Colorful)
   ======================================== */
 .header-banner {
   position: absolute;
@@ -96,9 +97,11 @@ canvas#ambient-canvas {
   font-family: var(--font-serif);
   font-style: italic;
   font-size: clamp(1rem, 3vw, 1.4rem);
-  color: var(--accent-color);
+  background: var(--grad-warm);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   letter-spacing: 0.1em;
-  opacity: 0.7;
+  font-weight: 600;
 }
 
 /* ========================================
@@ -128,7 +131,7 @@ canvas#ambient-canvas {
 }
 
 /* ========================================
-  NEW: STORY MODULES (Colorful Request)
+  NEW: STORY MODULES (Updated: Dynamic Colors)
   ======================================== */
 .story-card {
   max-width: 650px;
@@ -146,7 +149,9 @@ canvas#ambient-canvas {
   font-family: var(--font-serif);
   font-size: 2.8rem;
   margin-bottom: 1.5rem;
-  color: var(--accent-color);
+  background: var(--grad-vibrant);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .story-card p {
@@ -157,28 +162,29 @@ canvas#ambient-canvas {
   color: rgba(255,255,255,0.9);
 }
 
-/* Gradient Borders for Colorfulness */
-.grad-warm-border { border-top: 4px solid #ff6b6b; }
-.grad-vibrant-border { border-top: 4px solid #f5576c; }
-.grad-cool-border { border-top: 4px solid #2575fc; }
+/* Colorful Borders */
+.grad-warm-border { border-top: 5px solid #ff6b6b; box-shadow: 0 0 20px rgba(255, 107, 107, 0.2); }
+.grad-vibrant-border { border-top: 5px solid #f5576c; box-shadow: 0 0 20px rgba(245, 87, 108, 0.2); }
+.grad-cool-border { border-top: 5px solid #2575fc; box-shadow: 0 0 20px rgba(37, 117, 252, 0.2); }
 
 /* ========================================
-  NEW: MLA 12PT LETTER FORMAT
+  NEW: PINK MLA 12PT LETTER FORMAT
   ======================================== */
 .mla-letter {
-  background: #ffffff;
-  color: #1a1a1a;
-  padding: 1in; /* Standard 1-inch margins */
+  background: var(--pink-soft);
+  color: #4a1c2c; /* Deep berry for contrast */
+  padding: 1in;
   font-family: var(--font-mla);
   font-size: 12pt;
-  line-height: 2.0; /* Double spaced */
+  line-height: 2.0; 
   text-align: left;
   max-width: 800px;
   height: 85vh;
   overflow-y: auto;
   margin: auto;
   box-shadow: 0 40px 100px rgba(0,0,0,0.6);
-  user-select: text; /* Allow reading naturally */
+  user-select: text;
+  border-left: 8px solid var(--pink-accent);
 }
 
 .mla-header {
@@ -186,7 +192,7 @@ canvas#ambient-canvas {
 }
 
 .mla-body {
-  text-indent: 0.5in; /* Standard paragraph indent */
+  text-indent: 0.5in;
 }
 
 /* ========================================
@@ -216,8 +222,8 @@ canvas#ambient-canvas {
 .loader-bar { 
   height: 100%; 
   width: 0%; 
-  background: var(--accent-color); 
-  box-shadow: 0 0 15px var(--accent-glow); 
+  background: var(--grad-warm); 
+  box-shadow: 0 0 15px #ff6b6b; 
   transition: width 0.4s ease-out; 
 }
 
@@ -301,7 +307,7 @@ canvas#ambient-canvas {
 .vault-frame { 
   width: 100%; height: 100%; 
   background: #0d0d0f; 
-  border: 14px solid #050505; 
+  border: 14px solid #1a1a1a; 
   border-radius: 20px; 
   box-shadow: inset 0 0 100px #000, 0 40px 120px rgba(0,0,0,0.95); 
   position: relative; 
@@ -331,7 +337,7 @@ canvas#ambient-canvas {
 
 .vault-wheel { 
   width: 45%; height: 45%; 
-  border: 12px solid rgba(255,255,255,0.1); 
+  border: 12px solid rgba(251, 191, 36, 0.1); 
   border-radius: 50%; 
   position: relative; 
   transition: transform 5s cubic-bezier(0.6, 0, 0.1, 1); 
@@ -407,14 +413,16 @@ canvas#ambient-canvas {
 #scene-intro {
     flex-direction: column;
     padding: var(--padding-cinematic) var(--padding-standard);
-    background: radial-gradient(circle at center, #0f0a1a 0%, #05010a 100%);
+    background: radial-gradient(circle at center, #1a0a1f 0%, #05010a 100%);
 }
 
 #intro-text {
     font-family: var(--font-serif);
     font-size: clamp(1.4rem, 5vw, 2.5rem);
     line-height: 1.6;
-    color: var(--text-primary);
+    background: var(--grad-vibrant);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     text-align: center;
     max-width: 850px;
     margin: 0 auto;
@@ -571,7 +579,8 @@ canvas#ambient-canvas {
   width: 25px; height: 32px; border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
   animation: floatEthereal 40s linear infinite;
   filter: blur(2px);
-  background: rgba(251, 191, 36, 0.05);
+  background: var(--grad-vibrant);
+  opacity: 0.2;
 }
 
 @keyframes floatEthereal {
@@ -589,6 +598,25 @@ canvas#ambient-canvas {
 
 .scroll-hint span { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.4em; }
 .hint-line { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--accent-color), transparent); }
+
+/* ========================================
+  FINAL TEDDY BEAR MESSAGE 
+  ======================================== */
+.final-birthday-message {
+  margin: 4rem auto;
+  padding: 3rem;
+  max-width: 700px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed var(--accent-glow);
+  border-radius: 20px;
+  text-align: center;
+  line-height: 1.8;
+}
+
+.final-birthday-message strong {
+  color: var(--accent-color);
+  font-size: 1.3rem;
+}
 
 /* ========================================
   RESPONSIVE LOGIC
