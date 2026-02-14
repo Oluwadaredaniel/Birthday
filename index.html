@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Story of You</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "@google/genai": "https://esm.run/@google/genai"
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Cinematic Ambient Background -->
+  <canvas id="ambient-canvas"></canvas>
+  <div id="balloon-container"></div>
+  
+  <!-- Scene 0: Loading -->
+  <section id="scene-loading" class="scene active">
+    <div class="loader-wrap">
+      <div class="loader-bar-bg">
+        <div id="loader-progress" class="loader-bar"></div>
+      </div>
+      <p id="loader-message" class="loader-text">Assembling the fragments of us...</p>
+    </div>
+  </section>
+
+  <main id="app">
+    <!-- Scene 1: The Vault of Memories -->
+    <section id="scene-locked" class="scene">
+      <div id="focus-overlay" class="focus-overlay">
+        <div class="focus-prompt">
+          <span class="focus-icon">✧</span>
+          <p class="focus-text">A vault meant only for you.</p>
+          <p class="focus-subtext">(Tap to unlock)</p>
+        </div>
+      </div>
+
+      <div class="vault-stage">
+        <div id="bank-vault" class="bank-vault">
+          <div class="vault-frame">
+            <!-- Realistic Door Image Container -->
+            <div id="vault-door" class="vault-door">
+              <div id="vault-door-img" class="vault-door-image"></div>
+              <div class="vault-door-face">
+                <div id="vault-wheel" class="vault-wheel">
+                  <div class="wheel-spoke"></div>
+                  <div class="wheel-spoke"></div>
+                  <div class="wheel-spoke"></div>
+                  <div class="wheel-center"></div>
+                </div>
+              </div>
+            </div>
+            <div id="vault-glow" class="vault-interior-glow"></div>
+          </div>
+        </div>
+
+        <!-- Hyper-Realistic Narrative Guide -->
+        <div id="hero-character" class="hero-character hidden">
+          <div id="chibi-image-container" class="realistic-chibi">
+            <!-- Dynamic Image Injected Here -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 2: Cinematic Prologos -->
+    <section id="scene-intro" class="scene">
+      <div class="typewriter-container">
+        <h1 id="intro-text" class="serif italic"></h1>
+      </div>
+    </section>
+
+    <!-- Scene 3: The Infinite Mosaic -->
+    <section id="scene-overview" class="scene">
+      <div class="overview-header">
+        <h2 class="serif italic">Every Fragment of You</h2>
+        <p class="subtitle">A curation of light and memory</p>
+      </div>
+      <div id="mood-collage" class="mood-collage">
+        <!-- Injected via JS -->
+      </div>
+    </section>
+
+    <!-- Scene 4: Deep Immersive Gallery -->
+    <section id="scene-gallery" class="scene">
+      <button id="close-gallery" class="nav-btn-close" aria-label="Close Gallery">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      
+      <div id="horizontal-track" class="horizontal-track">
+        <!-- Gallery Slides Injected via JS -->
+      </div>
+      
+      <div class="scroll-hint">
+        <span>Gently slide through our history</span>
+        <div class="hint-line"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js" type="module"></script>
+</body>
+</html>
