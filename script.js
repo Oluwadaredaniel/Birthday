@@ -51,12 +51,10 @@ document.addEventListener('DOMContentLoaded', () => {
     sceneGallery: document.getElementById('scene-gallery'),
     sceneDoubt: document.getElementById('scene-doubt'),
     vaultDoor: document.getElementById('vault-door'),
-    vaultDoorImg: document.getElementById('vault-door-img'),
     vaultWheel: document.getElementById('vault-wheel'),
     vaultGlow: document.getElementById('vault-glow'),
     focusOverlay: document.getElementById('focus-overlay'),
     heroGuide: document.getElementById('hero-character'),
-    chibiContainer: document.getElementById('chibi-image-container'),
     introText: document.getElementById('intro-text'),
     moodCollage: document.getElementById('mood-collage'),
     galleryTrack: document.getElementById('horizontal-track'),
@@ -119,24 +117,38 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => transitionScene(elements.loader, elements.sceneLocked), 1000);
   }
 
+  /**
+   * UPDATED: Vault Unlock Logic
+   */
   elements.focusOverlay.addEventListener('click', async () => {
     if (hasTransitioned) return;
     hasTransitioned = true;
+
+    // 1. Hide prompt
+    elements.focusOverlay.style.transition = "opacity 0.8s ease";
     elements.focusOverlay.style.opacity = '0';
-    setTimeout(() => elements.focusOverlay.style.display = 'none', 1000);
     
     if (elements.heroGuide) elements.heroGuide.classList.remove('hidden');
 
-    await cinematicDelay(1000);
-    elements.vaultWheel.style.transform = 'rotate(1080deg)';
-    await cinematicDelay(2400);
-    elements.vaultDoor.style.transform = 'rotateY(-110deg)';
-    elements.vaultGlow.style.opacity = '1';
-    
-    await cinematicDelay(3000);
+    // 2. Wheel Animation
+    await cinematicDelay(500);
+    if (elements.vaultWheel) elements.vaultWheel.style.transform = 'rotate(1080deg)';
+
+    // 3. Door Animation
+    await cinematicDelay(2200);
+    if (elements.vaultDoor) elements.vaultDoor.style.transform = 'rotateY(-110deg)';
+    if (elements.vaultGlow) elements.vaultGlow.style.opacity = '1';
+
+    // 4. Scene Transition
+    await cinematicDelay(2500);
+    elements.focusOverlay.style.display = 'none';
+
     await transitionScene(elements.sceneLocked, elements.sceneIntro);
-    await runNarrativeEngine(elements.introText, dynamicPhrases);
-    await transitionScene(elements.sceneIntro, elements.sceneStory);
+    
+    if (elements.introText) {
+      await runNarrativeEngine(elements.introText, dynamicPhrases);
+      await transitionScene(elements.sceneIntro, elements.sceneStory);
+    }
   });
 
   // Story Click Sequencer
@@ -179,13 +191,8 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="wax-seal" style="margin-top:20pt; text-align:center; font-size:3rem;">${ETERNAL_LETTER.seal}</div>
         </div>`;
     } else {
-      let caption = "";
-      // Updated: Janet, this page is about you caption added below
-      if(index === 4) caption = `<p class="hidden-line">Janet, this page is about you.</p>`;
-      else caption = `<p class="hidden-line">Fragment of a beautiful soul.</p>`;
-      
-      // Fixed Structure: Image FIRST, Caption BELOW
-      slide.innerHTML = `<img src="${data.url}" alt="Memory"><div class="caption-container">${caption}</div>`;
+      let caption = (index === 4) ? "Janet, this page is about you." : "Fragment of a beautiful soul.";
+      slide.innerHTML = `<img src="${data.url}" alt="Memory"><div class="caption-container"><p class="hidden-line">${caption}</p></div>`;
     }
     return slide;
   }
@@ -202,12 +209,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // FIX: Exit button now returns to Overview (Grid) instead of getting stuck in Doubt
   elements.closeGalleryBtn.addEventListener('click', () => {
     isGalleryActive = false;
     transitionScene(elements.sceneGallery, elements.sceneOverview);
     
-    // Optional: Add a subtle way to reach the Doubt section after viewing images
     if(!document.getElementById('finish-btn')) {
         const finishBtn = document.createElement('button');
         finishBtn.id = 'finish-btn';
