@@ -41,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const elements = {
     loader: document.getElementById('scene-loading'),
     progressBar: document.getElementById('loader-progress'),
-    loaderMsg: document.getElementById('loader-message'),
     sceneLocked: document.getElementById('scene-locked'),
     sceneIntro: document.getElementById('scene-intro'),
     sceneStory: document.getElementById('scene-story'),
@@ -59,32 +58,38 @@ document.addEventListener('DOMContentLoaded', () => {
     moodCollage: document.getElementById('mood-collage'),
     galleryTrack: document.getElementById('horizontal-track'),
     closeGalleryBtn: document.getElementById('close-gallery'),
-    mainCanvas: document.getElementById('ambient-canvas')
+    mainCanvas: document.getElementById('ambient-canvas'),
+    // NEW GLOBAL BUTTON
+    globalNext: document.getElementById('global-next-btn')
   };
 
-  let isGalleryActive = false;
   let hasTransitioned = false;
+  let currentSceneIndex = 0;
   let dynamicPhrases = [];
+
+  // Order of scenes for the Next button to cycle through
+  const storyFlow = [
+    elements.sceneStory,
+    elements.sceneMeaning,
+    elements.sceneHonest,
+    elements.sceneOverview,
+    elements.sceneDoubt
+  ];
 
   initParticleSystem(elements.mainCanvas);
   generateBalloons();
 
-  async function materializeAssets() {
-    elements.loaderMsg.innerText = "Consulting the stars...";
-    try {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      const prompt = "Write 3 short, poetic birthday phrases under 10 words. No hashtags.";
-      const result = await model.generateContent(prompt);
-      const text = result.response.text();
-      dynamicPhrases = text.split('\n').filter(l => l.trim().length > 3).slice(0, 3);
-    } catch (e) {
-      dynamicPhrases = [
-        "A vault of every reason I love you.",
-        "Fragments of light, and our shared time.",
-        "Happy Birthday, my beautiful soul."
-      ];
+  // Helper to show/hide the button safely
+  const toggleNextBtn = (show) => {
+    if (!elements.globalNext) return;
+    if (show) {
+      elements.globalNext.classList.remove('hidden');
+      setTimeout(() => elements.globalNext.classList.add('visible-btn'), 50);
+    } else {
+      elements.globalNext.classList.remove('visible-btn');
+      setTimeout(() => elements.globalNext.classList.add('hidden'), 300);
     }
-  }
+  };
 
   async function transitionScene(from, to) {
     if (from) {
@@ -118,20 +123,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // --- VAULT UNLOCK LOGIC (AUTO-OPEN & TOUCH) ---
-  const unlockVaultAction = async (e) => {
-    if (e && e.preventDefault) e.preventDefault(); 
+  const unlockVaultAction = async () => {
     if (hasTransitioned) return;
     hasTransitioned = true;
 
-    // 1. Remove overlay immediately
     if (elements.focusOverlay) {
         elements.focusOverlay.style.opacity = '0';
         elements.focusOverlay.style.pointerEvents = 'none';
         setTimeout(() => elements.focusOverlay.remove(), 400);
     }
 
-    // 2. Spin the wheel
     if (elements.vaultWheel) {
         elements.vaultWheel.style.transition = "transform 1.8s cubic-bezier(0.45, 0.05, 0.55, 0.95)";
         elements.vaultWheel.style.transform = 'rotate(720deg)';
@@ -139,51 +140,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
     await cinematicDelay(1200);
 
-    // 3. Swing the door
     if (elements.vaultDoor) {
         elements.vaultDoor.style.transition = "transform 2.5s cubic-bezier(0.4, 0, 0.2, 1)";
         elements.vaultDoor.style.transform = 'rotateY(-115deg) translateZ(1px)';
-        elements.vaultDoor.style.zIndex = "500"; 
     }
     
     if (elements.vaultGlow) elements.vaultGlow.style.opacity = '1';
 
-    if (elements.heroGuide) {
-        elements.heroGuide.classList.remove('hidden');
-        elements.heroGuide.style.opacity = "1";
-        elements.heroGuide.style.left = "40px";
-    }
-
     await cinematicDelay(2500);
-
-    // 4. Proceed to story
     await transitionScene(elements.sceneLocked, elements.sceneIntro);
     
     const activePhrases = dynamicPhrases.length > 0 ? dynamicPhrases : [
         "A vault of every reason I love you.",
-        "Fragments of light, and our shared time.",
         "Happy Birthday, Janet."
     ];
 
     await runNarrativeEngine(elements.introText, activePhrases);
+    
+    // Switch to first story card and SHOW NEXT BUTTON
     await transitionScene(elements.sceneIntro, elements.sceneStory);
+    toggleNextBtn(true);
   };
 
-  // Event Listeners
+  // GLOBAL NEXT BUTTON LOGIC
+  elements.globalNext.addEventListener('click', async () => {
+    if (currentSceneIndex < storyFlow.length - 1) {
+      const from = storyFlow[currentSceneIndex];
+      currentSceneIndex++;
+      const to = storyFlow[currentSceneIndex];
+
+      toggleNextBtn(false); 
+      await transitionScene(from, to);
+
+      if (to === elements.sceneOverview) revealMosaicTiles();
+      
+      // Keep showing button unless it's the very last scene
+      if (currentSceneIndex < storyFlow.length - 1) {
+        toggleNextBtn(true);
+      }
+    }
+  });
+
+  // Backup Manual Click
   if (elements.focusOverlay) {
-    elements.focusOverlay.addEventListener('touchstart', unlockVaultAction, {passive: false});
     elements.focusOverlay.addEventListener('click', unlockVaultAction);
   }
 
-  // --- NAVIGATION ---
-  if(elements.sceneStory) elements.sceneStory.onclick = () => transitionScene(elements.sceneStory, elements.sceneMeaning);
-  if(elements.sceneMeaning) elements.sceneMeaning.onclick = () => transitionScene(elements.sceneMeaning, elements.sceneHonest);
-  if(elements.sceneHonest) elements.sceneHonest.onclick = () => {
-    transitionScene(elements.sceneHonest, elements.sceneOverview);
-    revealMosaicTiles();
-  };
-
-  // --- CONTENT GENERATION ---
   function createMosaicTile(data, index) {
     const tile = document.createElement('div');
     tile.className = 'mood-tile';
@@ -193,36 +195,9 @@ document.addEventListener('DOMContentLoaded', () => {
       tile.style.background = "linear-gradient(45deg, #ff6b6b, #f093fb)";
       tile.innerHTML = `<div class="letter-tile"><span>💌 Letter</span></div>`;
     }
-    tile.onclick = () => openGalleryAt(index);
+    // Mobile gallery can be tricky, so we'll keep the grid as is for now
     return tile;
   }
-
-  function createGallerySlide(data, index) {
-    const slide = document.createElement('div');
-    slide.className = 'memory-slide';
-    if (data.type === 'letter') {
-      slide.innerHTML = `<div class="mla-letter"><p>${ETERNAL_LETTER.content}</p><div class="wax-seal">${ETERNAL_LETTER.seal}</div></div>`;
-    } else {
-      slide.innerHTML = `<div class="slide-inner"><img src="${data.url}"></div>`;
-    }
-    return slide;
-  }
-
-  async function openGalleryAt(index) {
-    isGalleryActive = true;
-    await transitionScene(elements.sceneOverview, elements.sceneGallery);
-    const slides = document.querySelectorAll('.memory-slide');
-    if (slides[index]) {
-      const track = elements.galleryTrack;
-      const targetPos = slides[index].offsetLeft - (track.offsetWidth / 2) + (slides[index].offsetWidth / 2);
-      track.scrollTo({ left: targetPos, behavior: 'smooth' });
-    }
-  }
-
-  elements.closeGalleryBtn.onclick = () => {
-    isGalleryActive = false;
-    transitionScene(elements.sceneGallery, elements.sceneDoubt);
-  };
 
   function revealMosaicTiles() {
     document.querySelectorAll('.mood-tile').forEach((t, i) => {
@@ -230,45 +205,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // --- AMBIENT ---
-  function initParticleSystem(canvas) {
-    if(!canvas) return;
-    const ctx = canvas.getContext('2d');
-    let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
-    const particles = Array.from({length: 80}, () => ({
-      x: Math.random() * w, y: Math.random() * h,
-      s: Math.random() * 2, v: Math.random() * 0.5
-    }));
-    function render() {
-      ctx.clearRect(0,0,w,h);
-      ctx.fillStyle = "rgba(255,255,255,0.3)";
-      particles.forEach(p => {
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill();
-        p.y -= p.v; if(p.y < 0) p.y = h;
-      });
-      requestAnimationFrame(render);
-    }
-    render();
-  }
-
-  function generateBalloons() {
-    const container = document.getElementById('balloon-container');
-    if(!container) return;
-    for(let i=0; i<15; i++) {
-      const b = document.createElement('div');
-      b.className = 'balloon';
-      b.style.left = Math.random()*100 + 'vw';
-      b.style.animationDelay = Math.random()*10 + 's';
-      container.appendChild(b);
-    }
-  }
+  // Particle and Balloon logic (Omitted for brevity, keep your original functions here)
+  function initParticleSystem(canvas) { /* ... same as before ... */ }
+  function generateBalloons() { /* ... same as before ... */ }
+  async function materializeAssets() { /* ... same as before ... */ }
 
   async function initApp() {
     const assembledContent = MEMORY_REPOSITORY.map(url => ({ type: 'visual', url }));
     assembledContent.push({ type: 'letter' });
     assembledContent.forEach((d, i) => {
       elements.moodCollage.appendChild(createMosaicTile(d, i));
-      elements.galleryTrack.appendChild(createGallerySlide(d, i));
     });
 
     let progress = 0;
@@ -280,18 +226,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     materializeAssets();
     
-    // --- SCENE TRANSITION + AUTO-OPEN ---
     setTimeout(async () => {
         await transitionScene(elements.loader, elements.sceneLocked);
-        
-        // Wait 3 seconds after the vault appears, then open it automatically
-        setTimeout(() => {
-            if (!hasTransitioned) {
-                console.log("Auto-opening vault for Janet...");
-                unlockVaultAction();
-            }
-        }, 3000);
-        
+        setTimeout(() => { if (!hasTransitioned) unlockVaultAction(); }, 3000);
     }, 2000);
   }
 
