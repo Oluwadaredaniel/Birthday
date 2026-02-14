@@ -32,11 +32,6 @@ const MEMORY_REPOSITORY = [
   "https://ik.imagekit.io/kwujelxax/New%20Folder/IMG-20260213-WA0017.jpg",
 ];
 
-const ETERNAL_LETTER = {
-  content: "Happy Birthday, my love. There’s something about today that makes me pause a little longer. You are the most beautiful chapter in my story, and I never want this book to end. Thank you for your kindness, your laughter, and for loving me exactly as I am. May today be as extraordinary as you make my life feel every single day. Always and forever.",
-  seal: "❤"
-};
-
 document.addEventListener('DOMContentLoaded', () => {
   const elements = {
     loader: document.getElementById('scene-loading'),
@@ -47,19 +42,14 @@ document.addEventListener('DOMContentLoaded', () => {
     sceneMeaning: document.getElementById('scene-meaning'),
     sceneHonest: document.getElementById('scene-honest'),
     sceneOverview: document.getElementById('scene-overview'),
-    sceneGallery: document.getElementById('scene-gallery'),
     sceneDoubt: document.getElementById('scene-doubt'),
     vaultDoor: document.getElementById('vault-door'),
     vaultWheel: document.getElementById('vault-wheel'),
     vaultGlow: document.getElementById('vault-glow'),
     focusOverlay: document.getElementById('focus-overlay'),
-    heroGuide: document.getElementById('hero-character'),
     introText: document.getElementById('intro-text'),
     moodCollage: document.getElementById('mood-collage'),
-    galleryTrack: document.getElementById('horizontal-track'),
-    closeGalleryBtn: document.getElementById('close-gallery'),
     mainCanvas: document.getElementById('ambient-canvas'),
-    // NEW GLOBAL BUTTON
     globalNext: document.getElementById('global-next-btn')
   };
 
@@ -67,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentSceneIndex = 0;
   let dynamicPhrases = [];
 
-  // Order of scenes for the Next button to cycle through
   const storyFlow = [
     elements.sceneStory,
     elements.sceneMeaning,
@@ -79,7 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initParticleSystem(elements.mainCanvas);
   generateBalloons();
 
-  // Helper to show/hide the button safely
   const toggleNextBtn = (show) => {
     if (!elements.globalNext) return;
     if (show) {
@@ -156,46 +144,35 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     await runNarrativeEngine(elements.introText, activePhrases);
-    
-    // Switch to first story card and SHOW NEXT BUTTON
     await transitionScene(elements.sceneIntro, elements.sceneStory);
     toggleNextBtn(true);
   };
 
-  // GLOBAL NEXT BUTTON LOGIC
-  elements.globalNext.addEventListener('click', async () => {
-    if (currentSceneIndex < storyFlow.length - 1) {
-      const from = storyFlow[currentSceneIndex];
-      currentSceneIndex++;
-      const to = storyFlow[currentSceneIndex];
-
-      toggleNextBtn(false); 
-      await transitionScene(from, to);
-
-      if (to === elements.sceneOverview) revealMosaicTiles();
-      
-      // Keep showing button unless it's the very last scene
+  // Safe listener for the Next Button
+  if (elements.globalNext) {
+    elements.globalNext.addEventListener('click', async (e) => {
+      e.preventDefault();
       if (currentSceneIndex < storyFlow.length - 1) {
-        toggleNextBtn(true);
-      }
-    }
-  });
+        const from = storyFlow[currentSceneIndex];
+        currentSceneIndex++;
+        const to = storyFlow[currentSceneIndex];
 
-  // Backup Manual Click
-  if (elements.focusOverlay) {
-    elements.focusOverlay.addEventListener('click', unlockVaultAction);
+        toggleNextBtn(false); 
+        await transitionScene(from, to);
+
+        if (to === elements.sceneOverview) revealMosaicTiles();
+        
+        if (currentSceneIndex < storyFlow.length - 1) {
+          toggleNextBtn(true);
+        }
+      }
+    });
   }
 
-  function createMosaicTile(data, index) {
+  function createMosaicTile(url) {
     const tile = document.createElement('div');
     tile.className = 'mood-tile';
-    if (data.type === 'visual') {
-      tile.innerHTML = `<img src="${data.url}" loading="lazy">`;
-    } else {
-      tile.style.background = "linear-gradient(45deg, #ff6b6b, #f093fb)";
-      tile.innerHTML = `<div class="letter-tile"><span>💌 Letter</span></div>`;
-    }
-    // Mobile gallery can be tricky, so we'll keep the grid as is for now
+    tile.innerHTML = `<img src="${url}" loading="lazy">`;
     return tile;
   }
 
@@ -205,31 +182,69 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Particle and Balloon logic (Omitted for brevity, keep your original functions here)
-  function initParticleSystem(canvas) { /* ... same as before ... */ }
-  function generateBalloons() { /* ... same as before ... */ }
-  async function materializeAssets() { /* ... same as before ... */ }
+  function initParticleSystem(canvas) {
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
+    const particles = Array.from({length: 80}, () => ({
+      x: Math.random() * w, y: Math.random() * h,
+      s: Math.random() * 2, v: Math.random() * 0.5
+    }));
+    function render() {
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle = "rgba(255,255,255,0.3)";
+      particles.forEach(p => {
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill();
+        p.y -= p.v; if(p.y < 0) p.y = h;
+      });
+      requestAnimationFrame(render);
+    }
+    render();
+  }
+
+  function generateBalloons() {
+    const container = document.getElementById('balloon-container');
+    if(!container) return;
+    for(let i=0; i<15; i++) {
+      const b = document.createElement('div');
+      b.className = 'balloon';
+      b.style.left = Math.random()*100 + 'vw';
+      b.style.animationDelay = Math.random()*10 + 's';
+      container.appendChild(b);
+    }
+  }
+
+  async function materializeAssets() {
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const prompt = "Write 2 short, poetic birthday phrases under 10 words for Janet. No hashtags.";
+      const result = await model.generateContent(prompt);
+      const text = result.response.text();
+      dynamicPhrases = text.split('\n').filter(l => l.trim().length > 3).slice(0, 2);
+    } catch (e) {
+      dynamicPhrases = ["A vault of every reason I love you.", "Happy Birthday, Janet."];
+    }
+  }
 
   async function initApp() {
-    const assembledContent = MEMORY_REPOSITORY.map(url => ({ type: 'visual', url }));
-    assembledContent.push({ type: 'letter' });
-    assembledContent.forEach((d, i) => {
-      elements.moodCollage.appendChild(createMosaicTile(d, i));
+    MEMORY_REPOSITORY.forEach(url => {
+      elements.moodCollage.appendChild(createMosaicTile(url));
     });
 
     let progress = 0;
     const loaderInt = setInterval(() => {
       progress += 5;
       if(elements.progressBar) elements.progressBar.style.width = progress + '%';
-      if(progress >= 100) clearInterval(loaderInt);
+      if(progress >= 100) {
+        clearInterval(loaderInt);
+        setTimeout(async () => {
+          await transitionScene(elements.loader, elements.sceneLocked);
+          setTimeout(() => { if (!hasTransitioned) unlockVaultAction(); }, 3000);
+        }, 1000);
+      }
     }, 100);
 
     materializeAssets();
-    
-    setTimeout(async () => {
-        await transitionScene(elements.loader, elements.sceneLocked);
-        setTimeout(() => { if (!hasTransitioned) unlockVaultAction(); }, 3000);
-    }, 2000);
   }
 
   initApp();
