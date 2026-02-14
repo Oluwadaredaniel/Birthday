@@ -153,8 +153,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (data.type === 'visual') {
       tile.innerHTML = `<img src="${data.url}" loading="lazy">`;
     } else {
-      tile.style.background = "linear-gradient(135deg, #1d0a21, #05010a)";
-      tile.innerHTML = `<div class="letter-tile"><span>Our Letter</span></div>`;
+      tile.style.background = "var(--grad-vibrant)"; // Colorful Update
+      tile.innerHTML = `<div class="letter-tile" style="height:100%; display:flex; align-items:center; justify-content:center; color:white; font-family:var(--font-serif); font-size:1.5rem;"><span>💌 Open Letter</span></div>`;
     }
     tile.addEventListener('click', () => openGalleryAt(index));
     return tile;
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="mla-body">
             <p>${ETERNAL_LETTER.content}</p>
           </div>
-          <div class="wax-seal" style="margin-top:20pt; text-align:center;">${ETERNAL_LETTER.seal}</div>
+          <div class="wax-seal" style="margin-top:20pt; text-align:center; font-size:3rem;">${ETERNAL_LETTER.seal}</div>
         </div>`;
     } else {
       let caption = "";
@@ -230,8 +230,25 @@ document.addEventListener('DOMContentLoaded', () => {
     if(!canvas) return;
     const ctx = canvas.getContext('2d');
     let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
+    
+    // Ambient Starfield
+    const particles = Array.from({length: 100}, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      size: Math.random() * 2,
+      speed: Math.random() * 0.5
+    }));
+
     function render() {
       ctx.fillStyle = '#05010a'; ctx.fillRect(0,0,w,h);
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        p.y -= p.speed;
+        if(p.y < 0) p.y = h;
+      });
       requestAnimationFrame(render);
     }
     render();
@@ -240,11 +257,14 @@ document.addEventListener('DOMContentLoaded', () => {
   function generateBalloons() {
     const container = document.getElementById('balloon-container');
     if(!container) return;
-    for(let i=0; i<20; i++) {
+    const colors = ['#ff6b6b', '#f093fb', '#fbbf24', '#6a11cb']; // Vibrant Balloon Colors
+    for(let i=0; i<25; i++) {
       const b = document.createElement('div');
       b.className = 'balloon';
       b.style.left = Math.random()*100 + 'vw';
       b.style.animationDelay = Math.random()*20 + 's';
+      b.style.background = colors[Math.floor(Math.random() * colors.length)];
+      b.style.opacity = '0.3';
       container.appendChild(b);
     }
   }
