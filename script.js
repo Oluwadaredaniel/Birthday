@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (data.type === 'visual') {
       tile.innerHTML = `<img src="${data.url}" loading="lazy">`;
     } else {
-      tile.style.background = "var(--grad-vibrant)"; // Colorful Update
+      tile.style.background = "var(--grad-vibrant)";
       tile.innerHTML = `<div class="letter-tile" style="height:100%; display:flex; align-items:center; justify-content:center; color:white; font-family:var(--font-serif); font-size:1.5rem;"><span>💌 Open Letter</span></div>`;
     }
     tile.addEventListener('click', () => openGalleryAt(index));
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (data.type === 'letter') {
       slide.innerHTML = `
         <div class="mla-letter">
-          <div class="mla-header">Oyegoke<br>Janet<br>Feb 14, 2026</div>
+          <div class="mla-header">February 14, 2026</div>
           <div class="mla-body">
             <p>${ETERNAL_LETTER.content}</p>
           </div>
@@ -180,8 +180,12 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>`;
     } else {
       let caption = "";
-      if(index === 4) caption = `<p class="hidden-line">This is the face I silently thank God for.</p>`;
-      slide.innerHTML = `<div class="slide-inner"><img src="${data.url}">${caption}</div>`;
+      // Updated: Janet, this page is about you caption added below
+      if(index === 4) caption = `<p class="hidden-line">Janet, this page is about you.</p>`;
+      else caption = `<p class="hidden-line">Fragment of a beautiful soul.</p>`;
+      
+      // Fixed Structure: Image FIRST, Caption BELOW
+      slide.innerHTML = `<img src="${data.url}" alt="Memory"><div class="caption-container">${caption}</div>`;
     }
     return slide;
   }
@@ -198,9 +202,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // FIX: Exit button now returns to Overview (Grid) instead of getting stuck in Doubt
   elements.closeGalleryBtn.addEventListener('click', () => {
     isGalleryActive = false;
-    transitionScene(elements.sceneGallery, elements.sceneDoubt);
+    transitionScene(elements.sceneGallery, elements.sceneOverview);
+    
+    // Optional: Add a subtle way to reach the Doubt section after viewing images
+    if(!document.getElementById('finish-btn')) {
+        const finishBtn = document.createElement('button');
+        finishBtn.id = 'finish-btn';
+        finishBtn.innerText = "A Final Thought";
+        finishBtn.style = "margin: 2rem auto; display: block; padding: 1rem 2rem; background: var(--grad-vibrant); border: none; color: white; border-radius: 30px; cursor: pointer; font-family: var(--font-serif);";
+        finishBtn.onclick = () => transitionScene(elements.sceneOverview, elements.sceneDoubt);
+        elements.sceneOverview.appendChild(finishBtn);
+    }
   });
 
   function initGalleryParallax(slides) {
@@ -236,7 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const ctx = canvas.getContext('2d');
     let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
     
-    // Ambient Starfield
     const particles = Array.from({length: 100}, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
@@ -262,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function generateBalloons() {
     const container = document.getElementById('balloon-container');
     if(!container) return;
-    const colors = ['#ff6b6b', '#f093fb', '#fbbf24', '#6a11cb']; // Vibrant Balloon Colors
+    const colors = ['#ff6b6b', '#f093fb', '#fbbf24', '#6a11cb'];
     for(let i=0; i<25; i++) {
       const b = document.createElement('div');
       b.className = 'balloon';
@@ -285,4 +299,3 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function cinematicDelay(ms) { return new Promise(res => setTimeout(res, ms)); }
-
