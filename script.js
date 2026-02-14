@@ -94,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (to) {
       to.classList.add('active');
-      // Force reflow
       void to.offsetWidth;
       to.classList.add('visible');
       await cinematicDelay(800);
@@ -119,35 +118,52 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // --- VAULT UNLOCK LOGIC ---
+  // --- VAULT UNLOCK LOGIC (FIXED) ---
   elements.focusOverlay.addEventListener('click', async () => {
     if (hasTransitioned) return;
     hasTransitioned = true;
 
-    // 1. Hide the prompt
+    // 1. Instantly hide the prompt and disable interference
     elements.focusOverlay.style.opacity = '0';
     elements.focusOverlay.style.pointerEvents = 'none';
 
     // 2. Spin the wheel
     if (elements.vaultWheel) {
-        elements.vaultWheel.style.transition = "transform 2s cubic-bezier(0.45, 0.05, 0.55, 0.95)";
-        elements.vaultWheel.style.transform = 'rotate(1080deg)';
+        elements.vaultWheel.style.transition = "transform 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95)";
+        elements.vaultWheel.style.transform = 'rotate(720deg)';
     }
 
-    await cinematicDelay(2000);
+    await cinematicDelay(1000);
 
-    // 3. Swing the door
+    // 3. Swing the door with 3D depth
     if (elements.vaultDoor) {
-        elements.vaultDoor.style.transition = "transform 1.5s ease-in-out";
-        elements.vaultDoor.style.transform = 'rotateY(-110deg)';
+        elements.vaultDoor.style.transition = "transform 2s cubic-bezier(0.4, 0, 0.2, 1)";
+        elements.vaultDoor.style.transform = 'rotateY(-115deg)';
+        elements.vaultDoor.style.zIndex = "50"; 
     }
-    if (elements.vaultGlow) elements.vaultGlow.style.opacity = '1';
+    
+    if (elements.vaultGlow) {
+        elements.vaultGlow.style.opacity = '1';
+    }
+
+    // Bring character guide into view
+    if (elements.heroGuide) {
+        elements.heroGuide.style.left = "40px";
+    }
 
     await cinematicDelay(2000);
 
-    // 4. Transition to Intro
+    // 4. Transition to Narrative Intro
     await transitionScene(elements.sceneLocked, elements.sceneIntro);
-    await runNarrativeEngine(elements.introText, dynamicPhrases);
+    
+    // Ensure phrases exist even if API fails
+    const activePhrases = dynamicPhrases.length > 0 ? dynamicPhrases : [
+        "A vault of every reason I love you.",
+        "Fragments of light, and our shared time.",
+        "Happy Birthday, Janet."
+    ];
+
+    await runNarrativeEngine(elements.introText, activePhrases);
     await transitionScene(elements.sceneIntro, elements.sceneStory);
   });
 
@@ -254,7 +270,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if(progress >= 100) clearInterval(loaderInt);
     }, 100);
 
-    await materializeAssets();
+    // Run AI fetch but don't let it block the app start
+    materializeAssets();
+    
     setTimeout(() => transitionScene(elements.loader, elements.sceneLocked), 2000);
   }
 
