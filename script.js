@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/genai";
 
 /**
  * ========================================
@@ -28,7 +28,7 @@ const MEMORY_REPOSITORY = [
 ];
 
 const ETERNAL_LETTER = {
-  content: "Happy Birthday, my love. You are the most beautiful chapter in my story, and I never want this book to end. Thank you for your kindness, your laughter, and for loving me exactly as I am. May today be as extraordinary as you make my life feel every single day. Always and forever.",
+  content: "Happy Birthday, my love. There’s something about today that makes me pause a little longer. You are the most beautiful chapter in my story, and I never want this book to end. Thank you for your kindness, your laughter, and for loving me exactly as I am. May today be as extraordinary as you make my life feel every single day. Always and forever.",
   seal: "❤"
 };
 
@@ -39,8 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
     loaderMsg: document.getElementById('loader-message'),
     sceneLocked: document.getElementById('scene-locked'),
     sceneIntro: document.getElementById('scene-intro'),
+    sceneStory: document.getElementById('scene-story'),
+    sceneMeaning: document.getElementById('scene-meaning'),
+    sceneHonest: document.getElementById('scene-honest'),
     sceneOverview: document.getElementById('scene-overview'),
     sceneGallery: document.getElementById('scene-gallery'),
+    sceneDoubt: document.getElementById('scene-doubt'),
     vaultDoor: document.getElementById('vault-door'),
     vaultDoorImg: document.getElementById('vault-door-img'),
     vaultWheel: document.getElementById('vault-wheel'),
@@ -83,24 +87,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /**
-   * 2. NARRATIVE ENGINE (Improved Spacing & Indentation)
+   * 2. NARRATIVE ENGINE
    */
   async function runNarrativeEngine(container, textArray) {
     for (const phrase of textArray) {
-      // Clear container and set to textContent to avoid HTML parsing issues with spaces
       container.textContent = ""; 
-      
-      // Use Array.from to correctly iterate over string including spaces
       const chars = Array.from(phrase.trim());
-      
       for (let i = 0; i < chars.length; i++) {
         container.textContent += chars[i];
         await cinematicDelay(65);
       }
-      
       await cinematicDelay(3000);
-      
-      // Backspace logic - stays consistent with your original loop structure
       if (textArray.indexOf(phrase) < textArray.length - 1) {
         for (let i = phrase.length; i >= 0; i--) {
           container.textContent = phrase.slice(0, i);
@@ -126,6 +123,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => transitionScene(elements.loader, elements.sceneLocked), 1000);
   }
 
+  /**
+   * 4. STORY PROGRESSION LOGIC
+   */
   elements.focusOverlay.addEventListener('click', async () => {
     if (hasTransitioned) return;
     hasTransitioned = true;
@@ -143,9 +143,16 @@ document.addEventListener('DOMContentLoaded', () => {
     await cinematicDelay(3000);
     await transitionScene(elements.sceneLocked, elements.sceneIntro);
     await runNarrativeEngine(elements.introText, dynamicPhrases);
-    await transitionScene(elements.sceneIntro, elements.sceneOverview);
-    revealMosaicTiles();
+    await transitionScene(elements.sceneIntro, elements.sceneStory);
   });
+
+  // Story Click Sequencer
+  elements.sceneStory.onclick = () => transitionScene(elements.sceneStory, elements.sceneMeaning);
+  elements.sceneMeaning.onclick = () => transitionScene(elements.sceneMeaning, elements.sceneHonest);
+  elements.sceneHonest.onclick = () => {
+    transitionScene(elements.sceneHonest, elements.sceneOverview);
+    revealMosaicTiles();
+  };
 
   // Scene Core
   async function transitionScene(from, to) {
@@ -160,19 +167,29 @@ document.addEventListener('DOMContentLoaded', () => {
       tile.innerHTML = `<img src="${data.url}" loading="lazy">`;
     } else {
       tile.style.background = "linear-gradient(135deg, #1d0a21, #05010a)";
-      tile.innerHTML = `<div class="letter-tile"><span>Our Heart</span></div>`;
+      tile.innerHTML = `<div class="letter-tile"><span>Our Letter</span></div>`;
     }
     tile.addEventListener('click', () => openGalleryAt(index));
     return tile;
   }
 
-  function createGallerySlide(data) {
+  function createGallerySlide(data, index) {
     const slide = document.createElement('div');
     slide.className = 'memory-slide';
+    
     if (data.type === 'letter') {
-      slide.innerHTML = `<div class="envelope-slide"><p class="letter-text">${ETERNAL_LETTER.content}</p><div class="wax-seal">${ETERNAL_LETTER.seal}</div></div>`;
+      slide.innerHTML = `
+        <div class="mla-letter">
+          <div class="mla-header">Oyegoke<br>Janet<br>Feb 14, 2026</div>
+          <div class="mla-body">
+            <p>${ETERNAL_LETTER.content}</p>
+          </div>
+          <div class="wax-seal" style="margin-top:20pt; text-align:center;">${ETERNAL_LETTER.seal}</div>
+        </div>`;
     } else {
-      slide.innerHTML = `<div class="slide-inner"><img src="${data.url}"></div>`;
+      let caption = "";
+      if(index === 4) caption = `<p class="hidden-line">This is the face I silently thank God for.</p>`;
+      slide.innerHTML = `<div class="slide-inner"><img src="${data.url}">${caption}</div>`;
     }
     return slide;
   }
@@ -191,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   elements.closeGalleryBtn.addEventListener('click', () => {
     isGalleryActive = false;
-    transitionScene(elements.sceneGallery, elements.sceneOverview);
+    transitionScene(elements.sceneGallery, elements.sceneDoubt);
   });
 
   function initGalleryParallax(slides) {
@@ -200,7 +217,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { root: elements.galleryTrack, threshold: 0.5 });
     slides.forEach(s => observer.observe(s));
     
-    // Original Parallax logic remains here
     elements.galleryTrack.addEventListener('scroll', () => {
       if (!isGalleryActive) return;
       const trackCenter = elements.galleryTrack.scrollLeft + (elements.galleryTrack.offsetWidth / 2);
@@ -249,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
   assembledContent.push({ type: 'letter' });
   assembledContent.forEach((d, i) => {
     elements.moodCollage.appendChild(createMosaicTile(d, i));
-    elements.galleryTrack.appendChild(createGallerySlide(d));
+    elements.galleryTrack.appendChild(createGallerySlide(d, i));
   });
 
   runBootloader();
