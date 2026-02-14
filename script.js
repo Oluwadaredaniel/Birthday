@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/genai";
+import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
 /**
  * ========================================
@@ -66,9 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initParticleSystem(elements.mainCanvas);
   generateBalloons();
 
-  /**
-   * 1. ASSET MATERIALIZATION
-   */
   async function materializeAssets() {
     elements.loaderMsg.innerText = "Consulting the Gemini stars...";
     try {
@@ -86,9 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /**
-   * 2. NARRATIVE ENGINE
-   */
   async function runNarrativeEngine(container, textArray) {
     for (const phrase of textArray) {
       container.textContent = ""; 
@@ -107,25 +101,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /**
-   * 3. BOOTLOADER
-   */
   async function runBootloader() {
     let progress = 0;
     const interval = setInterval(() => {
       if (progress < 90) progress += 0.5;
-      elements.progressBar.style.width = `${progress}%`;
+      if(elements.progressBar) elements.progressBar.style.width = `${progress}%`;
     }, 50);
 
     await materializeAssets();
-    elements.progressBar.style.width = "100%";
+    if(elements.progressBar) elements.progressBar.style.width = "100%";
     clearInterval(interval);
     setTimeout(() => transitionScene(elements.loader, elements.sceneLocked), 1000);
   }
 
-  /**
-   * 4. STORY PROGRESSION LOGIC
-   */
   elements.focusOverlay.addEventListener('click', async () => {
     if (hasTransitioned) return;
     hasTransitioned = true;
@@ -147,14 +135,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Story Click Sequencer
-  elements.sceneStory.onclick = () => transitionScene(elements.sceneStory, elements.sceneMeaning);
-  elements.sceneMeaning.onclick = () => transitionScene(elements.sceneMeaning, elements.sceneHonest);
-  elements.sceneHonest.onclick = () => {
+  if(elements.sceneStory) elements.sceneStory.onclick = () => transitionScene(elements.sceneStory, elements.sceneMeaning);
+  if(elements.sceneMeaning) elements.sceneMeaning.onclick = () => transitionScene(elements.sceneMeaning, elements.sceneHonest);
+  if(elements.sceneHonest) elements.sceneHonest.onclick = () => {
     transitionScene(elements.sceneHonest, elements.sceneOverview);
     revealMosaicTiles();
   };
 
-  // Scene Core
   async function transitionScene(from, to) {
     if (from) { from.classList.remove('visible'); await cinematicDelay(1500); from.classList.remove('active'); }
     if (to) { to.classList.add('active'); void to.offsetWidth; to.classList.add('visible'); await cinematicDelay(1000); }
@@ -252,6 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function generateBalloons() {
     const container = document.getElementById('balloon-container');
+    if(!container) return;
     for(let i=0; i<20; i++) {
       const b = document.createElement('div');
       b.className = 'balloon';
@@ -264,8 +252,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const assembledContent = MEMORY_REPOSITORY.map(url => ({ type: 'visual', url }));
   assembledContent.push({ type: 'letter' });
   assembledContent.forEach((d, i) => {
-    elements.moodCollage.appendChild(createMosaicTile(d, i));
-    elements.galleryTrack.appendChild(createGallerySlide(d, i));
+    if(elements.moodCollage) elements.moodCollage.appendChild(createMosaicTile(d, i));
+    if(elements.galleryTrack) elements.galleryTrack.appendChild(createGallerySlide(d, i));
   });
 
   runBootloader();
