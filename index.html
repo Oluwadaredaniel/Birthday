@@ -7,7 +7,7 @@
   <script type="importmap">
     {
       "imports": {
-        "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        "@google/genai": "https://esm.run/@google/genai"
       }
     }
   </script>
@@ -19,14 +19,19 @@
   
   <section id="scene-loading" class="scene active">
     <div class="loader-wrap">
-      <div class="loader-bar-bg"><div id="loader-progress" class="loader-bar"></div></div>
+      <div class="loader-bar-bg">
+        <div id="loader-progress" class="loader-bar"></div>
+      </div>
       <p id="loader-message" class="loader-text">Assembling the fragments of us...</p>
     </div>
   </section>
 
   <main id="app">
     <section id="scene-locked" class="scene">
-      <div class="header-banner">"Some love stories shout. Ours feels steady, and that’s my favorite kind."</div>
+      <div class="header-banner">
+        <p>"Some love stories shout. Ours feels steady, and that’s my favorite kind."</p>
+      </div>
+
       <div id="focus-overlay" class="focus-overlay">
         <div class="focus-prompt">
           <span class="focus-icon">✧</span>
@@ -34,29 +39,40 @@
           <p class="focus-subtext">(Tap to unlock)</p>
         </div>
       </div>
+
       <div class="vault-stage">
-        <div class="bank-vault">
+        <div id="bank-vault" class="bank-vault">
           <div class="vault-frame">
             <div id="vault-door" class="vault-door">
-              <div id="vault-wheel" class="vault-wheel">
-                <div class="wheel-spoke"></div><div class="wheel-spoke"></div><div class="wheel-spoke"></div>
-                <div class="wheel-center"></div>
+              <div id="vault-door-img" class="vault-door-image"></div>
+              <div class="vault-door-face">
+                <div id="vault-wheel" class="vault-wheel">
+                  <div class="wheel-spoke"></div>
+                  <div class="wheel-spoke"></div>
+                  <div class="wheel-spoke"></div>
+                  <div class="wheel-center"></div>
+                </div>
               </div>
             </div>
             <div id="vault-glow" class="vault-interior-glow"></div>
           </div>
         </div>
+
+        <div id="hero-character" class="hero-character hidden">
+          <div id="chibi-image-container" class="realistic-chibi"></div>
+        </div>
       </div>
     </section>
 
     <section id="scene-intro" class="scene">
-      <h1 id="intro-text" class="serif italic"></h1>
+      <div class="typewriter-container">
+        <h1 id="intro-text" class="serif italic"></h1>
+      </div>
     </section>
 
     <section id="scene-story" class="scene">
-      <div class="story-card grad-warm">
+      <div class="story-card grad-warm-border">
         <h2>How It All Began</h2>
-        <h3>How We Met — And Everything After</h3>
         <p>It’s funny how the most important people in your life sometimes walk in so quietly. Janet and I met during a movie night in university. Nothing dramatic. No spotlight moment.</p>
         <p>We didn’t even talk that night. Just two people in the same room, watching the same film, completely unaware that something meaningful had just begun.</p>
         <p>You came into my life gently, but you stayed intentionally. 💛</p>
@@ -64,7 +80,7 @@
     </section>
 
     <section id="scene-meaning" class="scene">
-      <div class="story-card grad-vibrant">
+      <div class="story-card grad-vibrant-border">
         <h2>What You Mean To Me</h2>
         <p>Janet, you have this way of being present. You listen. You understand. You make things lighter without even trying.</p>
         <p>You’re soft but strong. Calm but expressive. Grounded but full of dreams. Being with you has been beautiful, not because everything is perfect, but because it’s real.</p>
@@ -72,7 +88,7 @@
     </section>
 
     <section id="scene-honest" class="scene">
-      <div class="story-card grad-cool">
+      <div class="story-card grad-cool-border">
         <h2>The Honest Part</h2>
         <p>I’m still building. Still fixing parts of my life. Still working on my finances. Still becoming the man I know I can be.</p>
         <p>Slow. Intentional. Healthy. Not because I love you any less, but because I love you enough to want to build something solid.</p>
@@ -84,20 +100,28 @@
         <h2 class="serif italic">Every Fragment of You</h2>
         <p class="subtitle">A curation of light and memory</p>
       </div>
-      <div id="mood-collage" class="mood-collage"></div>
+      <div id="mood-collage" class="mood-collage">
+        </div>
     </section>
 
     <section id="scene-gallery" class="scene">
-      <button id="close-gallery" class="nav-btn-close">
+      <button id="close-gallery" class="nav-btn-close" aria-label="Close Gallery">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
           <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
-      <div id="horizontal-track" class="horizontal-track"></div>
+      
+      <div id="horizontal-track" class="horizontal-track">
+        </div>
+      
+      <div class="scroll-hint">
+        <span>Gently slide through our history</span>
+        <div class="hint-line"></div>
+      </div>
     </section>
 
     <section id="scene-doubt" class="scene">
-      <div class="story-card grad-warm">
+      <div class="story-card grad-warm-border">
         <h2>If You Ever Doubt Yourself</h2>
         <p>If you ever doubt yourself, I hope you come back to this page. I hope you remember that there is someone who sees you clearly.</p>
         <p>Someone who admires your strength. Someone who notices your softness. Someone who values your mind, not just your beauty. You are not ordinary. And you are not unnoticed.</p>
