@@ -118,48 +118,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // --- VAULT UNLOCK LOGIC (FIXED FOR MOBILE) ---
+  // --- VAULT UNLOCK LOGIC (AUTO-OPEN & TOUCH) ---
   const unlockVaultAction = async (e) => {
-    if (e) e.preventDefault(); // Stop phantom clicks on mobile
+    if (e && e.preventDefault) e.preventDefault(); 
     if (hasTransitioned) return;
     hasTransitioned = true;
 
-    // 1. Instantly remove blocking overlay layer
+    // 1. Remove overlay immediately
     if (elements.focusOverlay) {
         elements.focusOverlay.style.opacity = '0';
         elements.focusOverlay.style.pointerEvents = 'none';
-        // Give a tiny moment for opacity before full removal
-        setTimeout(() => elements.focusOverlay.remove(), 300);
+        setTimeout(() => elements.focusOverlay.remove(), 400);
     }
 
     // 2. Spin the wheel
     if (elements.vaultWheel) {
-        elements.vaultWheel.style.transition = "transform 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95)";
+        elements.vaultWheel.style.transition = "transform 1.8s cubic-bezier(0.45, 0.05, 0.55, 0.95)";
         elements.vaultWheel.style.transform = 'rotate(720deg)';
     }
 
-    await cinematicDelay(1000);
+    await cinematicDelay(1200);
 
-    // 3. Swing the door with GPU acceleration (translateZ)
+    // 3. Swing the door
     if (elements.vaultDoor) {
         elements.vaultDoor.style.transition = "transform 2.5s cubic-bezier(0.4, 0, 0.2, 1)";
         elements.vaultDoor.style.transform = 'rotateY(-115deg) translateZ(1px)';
         elements.vaultDoor.style.zIndex = "500"; 
     }
     
-    if (elements.vaultGlow) {
-        elements.vaultGlow.style.opacity = '1';
-    }
+    if (elements.vaultGlow) elements.vaultGlow.style.opacity = '1';
 
-    // Bring character guide into view
     if (elements.heroGuide) {
+        elements.heroGuide.classList.remove('hidden');
         elements.heroGuide.style.opacity = "1";
         elements.heroGuide.style.left = "40px";
     }
 
-    await cinematicDelay(2000);
+    await cinematicDelay(2500);
 
-    // 4. Transition to Narrative Intro
+    // 4. Proceed to story
     await transitionScene(elements.sceneLocked, elements.sceneIntro);
     
     const activePhrases = dynamicPhrases.length > 0 ? dynamicPhrases : [
@@ -172,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
     await transitionScene(elements.sceneIntro, elements.sceneStory);
   };
 
-  // Attach both touch and click for mobile reliability
+  // Event Listeners
   if (elements.focusOverlay) {
     elements.focusOverlay.addEventListener('touchstart', unlockVaultAction, {passive: false});
     elements.focusOverlay.addEventListener('click', unlockVaultAction);
@@ -283,7 +280,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     materializeAssets();
     
-    setTimeout(() => transitionScene(elements.loader, elements.sceneLocked), 2000);
+    // --- SCENE TRANSITION + AUTO-OPEN ---
+    setTimeout(async () => {
+        await transitionScene(elements.loader, elements.sceneLocked);
+        
+        // Wait 3 seconds after the vault appears, then open it automatically
+        setTimeout(() => {
+            if (!hasTransitioned) {
+                console.log("Auto-opening vault for Janet...");
+                unlockVaultAction();
+            }
+        }, 3000);
+        
+    }, 2000);
   }
 
   initApp();
