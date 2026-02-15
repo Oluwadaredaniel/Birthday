@@ -29,7 +29,7 @@ const MEMORY_REPOSITORY = [
   "https://ik.imagekit.io/kwujelxax/New%20Folder/IMG-20260213-WA0037.jpg",
   "https://ik.imagekit.io/kwujelxax/New%20Folder/IMG-20260213-WA0041.jpg",
   "https://ik.imagekit.io/kwujelxax/New%20Folder/IMG-20260213-WA0042.jpg",
-  "https://ik.imagekit.io/kwujelxax/New%20Folder/IMG-20260213-WA0017.jpg",
+  "https://ik.imagekit.io/kwujelxax/New%20Folder/IMG-20260213-WA0017.jpg"
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -377,3 +377,4 @@ document.addEventListener('DOMContentLoaded', () => {
 function cinematicDelay(ms) {
   return new Promise(res => setTimeout(res, ms));
 }
+
