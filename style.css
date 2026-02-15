@@ -1,7 +1,7 @@
 /* ========================================
   CINEMATIC DESIGN FRAMEWORK
   A Story of You - Immersive Birthday Experience
-  Updated with Janet's Custom Requests
+  Updated with Janet's Custom Requests & Interactive Fixes
   ======================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Inter:wght@100;200;300;400;500&family=Dancing+Script:wght@400;500;600;700&display=swap');
@@ -495,7 +495,7 @@ canvas#ambient-canvas {
 }
 
 /* ========================================
-  SCENE: MOSAIC COLLAGE
+  SCENE: MOSAIC COLLAGE (GRID OVERVIEW)
   ======================================== */
 
 #scene-overview { 
@@ -540,7 +540,7 @@ canvas#ambient-canvas {
   width: 100%; 
   max-width: 1500px; 
   margin: 0 auto;
-  padding-bottom: 12rem;
+  padding-bottom: 5rem; /* Reduced to fit Teddy section closer */
 }
 
 .mood-tile { 
@@ -570,6 +570,38 @@ canvas#ambient-canvas {
 }
 
 /* ========================================
+  [UPDATE] FINAL TEDDY BEAR MESSAGE SPACING 
+  (Now inside Scene Overview)
+  ======================================= */
+.final-birthday-message {
+  margin-top: 10rem; /* Spacing from the Gallery/Grid */
+  margin-bottom: 12rem;
+  padding: 4rem 2rem;
+  width: 100%;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid var(--glass-border);
+  border-radius: 40px;
+  text-align: center;
+  line-height: 2.0;
+}
+
+.final-birthday-message p {
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.teddy-sig {
+    font-family: var(--font-cursive);
+    color: var(--accent-color);
+    font-size: 2.2rem;
+    margin-top: 2rem;
+}
+
+/* ========================================
   SCENE: DEEP GALLERY (Updated Fixes)
   ======================================== */
 
@@ -593,11 +625,11 @@ canvas#ambient-canvas {
   position: relative;
   z-index: 5;
   -webkit-overflow-scrolling: touch; /* SMOOTH IOS SWIPE */
+  pointer-events: all; /* Ensure click/touch passes through */
 }
 
 .horizontal-track::-webkit-scrollbar { display: none; }
 
-/* FIX: Changed class name to match item creation in JS */
 .horizontal-item, .memory-slide {
   flex: 0 0 80vw; 
   height: 80vh; 
@@ -618,25 +650,51 @@ canvas#ambient-canvas {
   box-shadow: 0 40px 120px rgba(0,0,0,0.85);
 }
 
-.memory-slide.focused { filter: blur(0) brightness(1); opacity: 1; transform: scale(1.02); }
-
-/* CAPTION POSITIONED BELOW PHOTO */
-.hidden-line {
-  font-family: var(--font-serif);
-  font-style: italic;
-  color: var(--accent-color);
-  font-size: clamp(1rem, 4vw, 1.4rem);
-  margin-top: 2rem;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.8s var(--ease-cinematic) 0.5s;
-  text-align: center;
-  max-width: 80%;
+/* ========================================
+  [UPDATE] DOUBT SECTION INTERACTIVE BUTTONS
+  ======================================= */
+.doubt-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
 }
 
-.memory-slide.focused .hidden-line {
-  opacity: 1;
-  transform: translateY(0);
+.action-circle {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--accent-glow);
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  font-size: 1.6rem;
+  cursor: pointer;
+  transition: all 0.4s var(--ease-cinematic);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-circle:hover {
+  transform: scale(1.2) rotate(10deg);
+  background: var(--accent-glow);
+  box-shadow: 0 0 25px var(--accent-glow);
+}
+
+.back-link-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  text-decoration: underline;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.back-link-btn:hover {
+  color: var(--accent-color);
 }
 
 /* ========================================
@@ -677,30 +735,6 @@ canvas#ambient-canvas {
 .hint-line { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--accent-color), transparent); }
 
 /* ========================================
-  FINAL TEDDY BEAR MESSAGE 
-  ======================================= */
-.final-birthday-message {
-  margin: 4rem auto;
-  padding: 3rem;
-  max-width: 700px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px dashed var(--accent-glow);
-  border-radius: 20px;
-  text-align: center;
-  line-height: 1.8;
-}
-
-.final-birthday-message strong {
-  color: var(--accent-color);
-  font-size: 1.3rem;
-}
-
-.teddy-sig {
-    font-family: var(--font-cursive);
-    color: var(--accent-color);
-}
-
-/* ========================================
   RESPONSIVE LOGIC
   ======================================== */
 
@@ -712,7 +746,8 @@ canvas#ambient-canvas {
   .bank-vault { width: 85vw; }
   .overview-header h2 { font-size: 2.2rem; }
   .mla-letter { padding: 0.5in; font-size: 11pt; }
-  .story-card { padding: 2rem; width: 90%; }
+  .story-card { padding: 2.5rem 1.5rem; width: 90%; }
+  .final-birthday-message { margin-top: 5rem; padding: 2rem 1rem; }
   
   /* Mobile tweak for Next Button */
   .next-trigger {
