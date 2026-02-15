@@ -510,9 +510,9 @@ canvas#ambient-canvas {
   flex-direction: column; 
   padding: var(--padding-cinematic) var(--padding-standard) 0; 
   justify-content: flex-start; 
-  height: auto !important; /* Force to be as long as content */
+  height: auto !important; 
   min-height: 100vh;
-  overflow-y: visible !important; /* Force visibility */
+  overflow-y: visible !important; /* Force vertical scroll availability */
   scrollbar-width: none;
   position: relative;
 }
@@ -620,6 +620,7 @@ canvas#ambient-canvas {
   z-index: 1000;
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* Gallery view itself locks to horizontal swipe */
 }
 
 .horizontal-track {
@@ -636,7 +637,7 @@ canvas#ambient-canvas {
   z-index: 5;
   -webkit-overflow-scrolling: touch;
   pointer-events: all;
-  touch-action: pan-x;
+  touch-action: pan-x; /* Explicitly allows sideways swipe in focus mode */
   overscroll-behavior-x: contain;
 }
 
