@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+import { GoogleGenerativeAI } from "https://esm.run/@google/genai";
 
 /**
  * ========================================
@@ -50,7 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
     introText: document.getElementById('intro-text'),
     moodCollage: document.getElementById('mood-collage'),
     mainCanvas: document.getElementById('ambient-canvas'),
-    globalNext: document.getElementById('global-next-btn')
+    // FIX: Match the ID in index.html
+    globalNext: document.getElementById('next-btn') 
   };
 
   let hasTransitioned = false;
@@ -71,11 +72,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const toggleNextBtn = (show) => {
     if (!elements.globalNext) return;
     if (show) {
-      elements.globalNext.classList.remove('hidden');
-      setTimeout(() => elements.globalNext.classList.add('visible-btn'), 50);
+      // Logic for Fade In
+      elements.globalNext.style.display = 'flex';
+      void elements.globalNext.offsetWidth; // Trigger reflow
+      elements.globalNext.classList.add('visible-btn');
     } else {
+      // Logic for Fade Out
       elements.globalNext.classList.remove('visible-btn');
-      setTimeout(() => elements.globalNext.classList.add('hidden'), 300);
+      // Delay display none until after fade animation
+      setTimeout(() => {
+        if (!elements.globalNext.classList.contains('visible-btn')) {
+            elements.globalNext.style.display = 'none';
+        }
+      }, 600);
     }
   };
 
@@ -84,8 +93,10 @@ document.addEventListener('DOMContentLoaded', () => {
       from.classList.remove('visible');
       await cinematicDelay(800);
       from.classList.remove('active');
+      from.style.display = 'none';
     }
     if (to) {
+      to.style.display = 'flex';
       to.classList.add('active');
       void to.offsetWidth;
       to.classList.add('visible');
@@ -152,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (elements.globalNext) {
     elements.globalNext.addEventListener('click', async (e) => {
       e.preventDefault();
+      // Ensure we haven't reached the last scene
       if (currentSceneIndex < storyFlow.length - 1) {
         const from = storyFlow[currentSceneIndex];
         currentSceneIndex++;
@@ -162,6 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (to === elements.sceneOverview) revealMosaicTiles();
         
+        // Hide button on the very last scene
         if (currentSceneIndex < storyFlow.length - 1) {
           toggleNextBtn(true);
         }
@@ -227,9 +240,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function initApp() {
-    MEMORY_REPOSITORY.forEach(url => {
-      elements.moodCollage.appendChild(createMosaicTile(url));
-    });
+    // Fill the collage
+    if (elements.moodCollage) {
+        MEMORY_REPOSITORY.forEach(url => {
+            elements.moodCollage.appendChild(createMosaicTile(url));
+        });
+    }
 
     let progress = 0;
     const loaderInt = setInterval(() => {
@@ -239,6 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clearInterval(loaderInt);
         setTimeout(async () => {
           await transitionScene(elements.loader, elements.sceneLocked);
+          // Auto-unlock vault after 3 seconds for Janet
           setTimeout(() => { if (!hasTransitioned) unlockVaultAction(); }, 3000);
         }, 1000);
       }
