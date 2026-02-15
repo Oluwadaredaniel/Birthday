@@ -33,6 +33,7 @@ const MEMORY_REPOSITORY = [
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
+
   const elements = {
     loader: document.getElementById('scene-loading'),
     progressBar: document.getElementById('loader-progress'),
@@ -52,10 +53,10 @@ document.addEventListener('DOMContentLoaded', () => {
     moodCollage: document.getElementById('mood-collage'),
     horizontalTrack: document.getElementById('horizontal-track'),
     closeGallery: document.getElementById('close-gallery'),
-    heartBtn: document.getElementById('heart-btn'), // Added for Doubt section
-    backToGallery: document.getElementById('back-to-gallery'), // Added for Doubt section
+    heartBtn: document.getElementById('heart-btn'),
+    backToGallery: document.getElementById('back-to-gallery'),
     mainCanvas: document.getElementById('ambient-canvas'),
-    globalNext: document.getElementById('next-btn') 
+    globalNext: document.getElementById('next-btn')
   };
 
   let hasTransitioned = false;
@@ -73,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initParticleSystem(elements.mainCanvas);
   generateBalloons();
 
-  // INTERACTIVE BUTTONS (DOUBT SECTION)
   if (elements.heartBtn) {
     elements.heartBtn.onclick = () => {
       elements.heartBtn.style.transform = "scale(1.6) rotate(15deg)";
@@ -84,22 +84,45 @@ document.addEventListener('DOMContentLoaded', () => {
   if (elements.backToGallery) {
     elements.backToGallery.onclick = async () => {
       await transitionScene(elements.sceneDoubt, elements.sceneOverview);
-      currentSceneIndex = 3; // Reset flow index to Overview
+      currentSceneIndex = 3;
       toggleNextBtn(true);
     };
   }
 
-  // HORIZONTAL SCROLL ENABLE
+  // ✅ FIXED HORIZONTAL SCROLL (desktop + mobile)
   if (elements.horizontalTrack) {
-    elements.horizontalTrack.addEventListener('wheel', (e) => {
+
+    const track = elements.horizontalTrack;
+
+    // wheel scroll fix
+    track.addEventListener('wheel', (e) => {
       if (e.deltaY !== 0) {
         e.preventDefault();
-        elements.horizontalTrack.scrollLeft += e.deltaY;
+        track.scrollLeft += e.deltaY;
       }
+    }, { passive: false });
+
+    // mobile swipe scroll
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    track.addEventListener('touchstart', e => {
+      isDown = true;
+      startX = e.touches[0].pageX - track.offsetLeft;
+      scrollLeft = track.scrollLeft;
     });
+
+    track.addEventListener('touchmove', e => {
+      if (!isDown) return;
+      const x = e.touches[0].pageX - track.offsetLeft;
+      const walk = (x - startX) * 1.5;
+      track.scrollLeft = scrollLeft - walk;
+    });
+
+    track.addEventListener('touchend', () => isDown = false);
   }
 
-  // CLOSE GALLERY HANDLER
   if (elements.closeGallery) {
     elements.closeGallery.onclick = () => {
       transitionScene(elements.sceneGallery, elements.sceneOverview);
@@ -111,13 +134,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!elements.globalNext) return;
     if (show) {
       elements.globalNext.style.display = 'flex';
-      void elements.globalNext.offsetWidth; 
+      void elements.globalNext.offsetWidth;
       elements.globalNext.classList.add('visible-btn');
     } else {
       elements.globalNext.classList.remove('visible-btn');
       setTimeout(() => {
         if (!elements.globalNext.classList.contains('visible-btn')) {
-            elements.globalNext.style.display = 'none';
+          elements.globalNext.style.display = 'none';
         }
       }, 600);
     }
@@ -141,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function runNarrativeEngine(container, textArray) {
     for (const phrase of textArray) {
-      container.textContent = ""; 
+      container.textContent = "";
       const chars = Array.from(phrase.trim());
       for (let i = 0; i < chars.length; i++) {
         container.textContent += chars[i];
@@ -162,31 +185,31 @@ document.addEventListener('DOMContentLoaded', () => {
     hasTransitioned = true;
 
     if (elements.focusOverlay) {
-        elements.focusOverlay.style.opacity = '0';
-        elements.focusOverlay.style.pointerEvents = 'none';
-        setTimeout(() => elements.focusOverlay.remove(), 400);
+      elements.focusOverlay.style.opacity = '0';
+      elements.focusOverlay.style.pointerEvents = 'none';
+      setTimeout(() => elements.focusOverlay.remove(), 400);
     }
 
     if (elements.vaultWheel) {
-        elements.vaultWheel.style.transition = "transform 1.8s cubic-bezier(0.45, 0.05, 0.55, 0.95)";
-        elements.vaultWheel.style.transform = 'rotate(720deg)';
+      elements.vaultWheel.style.transition = "transform 1.8s cubic-bezier(0.45, 0.05, 0.55, 0.95)";
+      elements.vaultWheel.style.transform = 'rotate(720deg)';
     }
 
     await cinematicDelay(1200);
 
     if (elements.vaultDoor) {
-        elements.vaultDoor.style.transition = "transform 2.5s cubic-bezier(0.4, 0, 0.2, 1)";
-        elements.vaultDoor.style.transform = 'rotateY(-115deg) translateZ(1px)';
+      elements.vaultDoor.style.transition = "transform 2.5s cubic-bezier(0.4, 0, 0.2, 1)";
+      elements.vaultDoor.style.transform = 'rotateY(-115deg) translateZ(1px)';
     }
-    
+
     if (elements.vaultGlow) elements.vaultGlow.style.opacity = '1';
 
     await cinematicDelay(2500);
     await transitionScene(elements.sceneLocked, elements.sceneIntro);
-    
+
     const activePhrases = dynamicPhrases.length > 0 ? dynamicPhrases : [
-        "A vault of every reason I love you.",
-        "Happy Birthday, Janet."
+      "A vault of every reason I love you.",
+      "Happy Birthday, Janet."
     ];
 
     await runNarrativeEngine(elements.introText, activePhrases);
@@ -202,11 +225,11 @@ document.addEventListener('DOMContentLoaded', () => {
         currentSceneIndex++;
         const to = storyFlow[currentSceneIndex];
 
-        toggleNextBtn(false); 
+        toggleNextBtn(false);
         await transitionScene(from, to);
 
         if (to === elements.sceneOverview) revealMosaicTiles();
-        
+
         if (currentSceneIndex < storyFlow.length - 1) {
           toggleNextBtn(true);
         }
@@ -218,28 +241,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const tile = document.createElement('div');
     tile.className = 'mood-tile';
     tile.innerHTML = `<img src="${url}" loading="lazy">`;
-    
-    // CLICK TO OPEN GALLERY
+
     tile.onclick = () => {
       toggleNextBtn(false);
       transitionScene(elements.sceneOverview, elements.sceneGallery);
-      // Scroll track to the specific image
-      const targetImg = [...elements.horizontalTrack.querySelectorAll('img')].find(img => img.src === url);
+
+      const targetImg = [...elements.horizontalTrack.querySelectorAll('img')]
+        .find(img => img.src === url);
+
       if (targetImg) targetImg.parentElement.scrollIntoView();
     };
-    
+
     return tile;
   }
 
   function revealMosaicTiles() {
-    // Populate the horizontal track simultaneously
     if (elements.horizontalTrack && elements.horizontalTrack.children.length === 0) {
-        MEMORY_REPOSITORY.forEach(url => {
-            const slide = document.createElement('div');
-            slide.className = 'horizontal-item';
-            slide.innerHTML = `<img src="${url}">`;
-            elements.horizontalTrack.appendChild(slide);
-        });
+      MEMORY_REPOSITORY.forEach(url => {
+        const slide = document.createElement('div');
+        slide.className = 'horizontal-item';
+        slide.innerHTML = `<img src="${url}">`;
+        elements.horizontalTrack.appendChild(slide);
+      });
     }
 
     document.querySelectorAll('.mood-tile').forEach((t, i) => {
@@ -248,33 +271,42 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function initParticleSystem(canvas) {
-    if(!canvas) return;
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
-    const particles = Array.from({length: 80}, () => ({
-      x: Math.random() * w, y: Math.random() * h,
-      s: Math.random() * 2, v: Math.random() * 0.5
+    let w = canvas.width = window.innerWidth,
+        h = canvas.height = window.innerHeight;
+
+    const particles = Array.from({ length: 80 }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      s: Math.random() * 2,
+      v: Math.random() * 0.5
     }));
+
     function render() {
-      ctx.clearRect(0,0,w,h);
+      ctx.clearRect(0, 0, w, h);
       ctx.fillStyle = "rgba(255,255,255,0.3)";
       particles.forEach(p => {
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill();
-        p.y -= p.v; if(p.y < 0) p.y = h;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.s, 0, Math.PI * 2);
+        ctx.fill();
+        p.y -= p.v;
+        if (p.y < 0) p.y = h;
       });
       requestAnimationFrame(render);
     }
+
     render();
   }
 
   function generateBalloons() {
     const container = document.getElementById('balloon-container');
-    if(!container) return;
-    for(let i=0; i<15; i++) {
+    if (!container) return;
+    for (let i = 0; i < 15; i++) {
       const b = document.createElement('div');
       b.className = 'balloon';
-      b.style.left = Math.random()*100 + 'vw';
-      b.style.animationDelay = Math.random()*10 + 's';
+      b.style.left = Math.random() * 100 + 'vw';
+      b.style.animationDelay = Math.random() * 10 + 's';
       container.appendChild(b);
     }
   }
@@ -286,27 +318,35 @@ document.addEventListener('DOMContentLoaded', () => {
       const result = await model.generateContent(prompt);
       const text = result.response.text();
       dynamicPhrases = text.split('\n').filter(l => l.trim().length > 3).slice(0, 2);
-    } catch (e) {
-      dynamicPhrases = ["A vault of every reason I love you.", "Happy Birthday, Janet."];
+    } catch {
+      dynamicPhrases = [
+        "A vault of every reason I love you.",
+        "Happy Birthday, Janet."
+      ];
     }
   }
 
   async function initApp() {
     if (elements.moodCollage) {
-        MEMORY_REPOSITORY.forEach(url => {
-            elements.moodCollage.appendChild(createMosaicTile(url));
-        });
+      MEMORY_REPOSITORY.forEach(url => {
+        elements.moodCollage.appendChild(createMosaicTile(url));
+      });
     }
 
     let progress = 0;
+
     const loaderInt = setInterval(() => {
       progress += 5;
-      if(elements.progressBar) elements.progressBar.style.width = progress + '%';
-      if(progress >= 100) {
+      if (elements.progressBar)
+        elements.progressBar.style.width = progress + '%';
+
+      if (progress >= 100) {
         clearInterval(loaderInt);
         setTimeout(async () => {
           await transitionScene(elements.loader, elements.sceneLocked);
-          setTimeout(() => { if (!hasTransitioned) unlockVaultAction(); }, 3000);
+          setTimeout(() => {
+            if (!hasTransitioned) unlockVaultAction();
+          }, 3000);
         }, 1000);
       }
     }, 100);
@@ -317,4 +357,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initApp();
 });
 
-function cinematicDelay(ms) { return new Promise(res => setTimeout(res, ms)); }
+function cinematicDelay(ms) {
+  return new Promise(res => setTimeout(res, ms));
+}
