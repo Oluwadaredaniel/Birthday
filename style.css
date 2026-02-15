@@ -651,6 +651,10 @@ horizontal-track {
   justify-content: center;
   position: relative;
 }
+.horizontal-track.dragging {
+  cursor: grabbing;
+  scroll-behavior: auto;
+}
 
 .horizontal-item img, .memory-slide img {
   max-width: 100%;
@@ -769,4 +773,5 @@ horizontal-track {
 }
 
 /* END OF FRAMEWORK */
+
 
