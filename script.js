@@ -89,23 +89,18 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // ✅ FIXED HORIZONTAL SCROLL (desktop + mobile)
+  // Smooth horizontal scroll
   if (elements.horizontalTrack) {
-
     const track = elements.horizontalTrack;
 
-    // wheel scroll fix
-    track.addEventListener('wheel', (e) => {
+    track.addEventListener('wheel', e => {
       if (e.deltaY !== 0) {
         e.preventDefault();
         track.scrollLeft += e.deltaY;
       }
     }, { passive: false });
 
-    // mobile swipe scroll
-    let isDown = false;
-    let startX;
-    let scrollLeft;
+    let isDown = false, startX, scrollLeft;
 
     track.addEventListener('touchstart', e => {
       isDown = true;
@@ -116,8 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     track.addEventListener('touchmove', e => {
       if (!isDown) return;
       const x = e.touches[0].pageX - track.offsetLeft;
-      const walk = (x - startX) * 1.5;
-      track.scrollLeft = scrollLeft - walk;
+      track.scrollLeft = scrollLeft - (x - startX) * 1.5;
     });
 
     track.addEventListener('touchend', () => isDown = false);
@@ -163,20 +157,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function runNarrativeEngine(container, textArray) {
+    if (!container) return;
     for (const phrase of textArray) {
       container.textContent = "";
-      const chars = Array.from(phrase.trim());
-      for (let i = 0; i < chars.length; i++) {
-        container.textContent += chars[i];
+      for (const char of phrase) {
+        container.textContent += char;
         await cinematicDelay(65);
       }
       await cinematicDelay(2500);
-      if (textArray.indexOf(phrase) < textArray.length - 1) {
-        for (let i = phrase.length; i >= 0; i--) {
-          container.textContent = phrase.slice(0, i);
-          await cinematicDelay(20);
-        }
-      }
     }
   }
 
@@ -191,48 +179,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (elements.vaultWheel) {
-      elements.vaultWheel.style.transition = "transform 1.8s cubic-bezier(0.45, 0.05, 0.55, 0.95)";
       elements.vaultWheel.style.transform = 'rotate(720deg)';
     }
 
     await cinematicDelay(1200);
 
     if (elements.vaultDoor) {
-      elements.vaultDoor.style.transition = "transform 2.5s cubic-bezier(0.4, 0, 0.2, 1)";
-      elements.vaultDoor.style.transform = 'rotateY(-115deg) translateZ(1px)';
+      elements.vaultDoor.style.transform = 'rotateY(-115deg)';
     }
 
     if (elements.vaultGlow) elements.vaultGlow.style.opacity = '1';
 
     await cinematicDelay(2500);
+
     await transitionScene(elements.sceneLocked, elements.sceneIntro);
 
-    const activePhrases = dynamicPhrases.length > 0 ? dynamicPhrases : [
+    const phrases = dynamicPhrases.length ? dynamicPhrases : [
       "A vault of every reason I love you.",
       "Happy Birthday, Janet."
     ];
 
-    await runNarrativeEngine(elements.introText, activePhrases);
+    await runNarrativeEngine(elements.introText, phrases);
     await transitionScene(elements.sceneIntro, elements.sceneStory);
     toggleNextBtn(true);
   };
 
   if (elements.globalNext) {
-    elements.globalNext.addEventListener('click', async (e) => {
+    elements.globalNext.addEventListener('click', async e => {
       e.preventDefault();
       if (currentSceneIndex < storyFlow.length - 1) {
-        const from = storyFlow[currentSceneIndex];
-        currentSceneIndex++;
+        const from = storyFlow[currentSceneIndex++];
         const to = storyFlow[currentSceneIndex];
 
         toggleNextBtn(false);
         await transitionScene(from, to);
 
         if (to === elements.sceneOverview) revealMosaicTiles();
-
-        if (currentSceneIndex < storyFlow.length - 1) {
-          toggleNextBtn(true);
-        }
+        if (currentSceneIndex < storyFlow.length - 1) toggleNextBtn(true);
       }
     });
   }
@@ -246,17 +229,17 @@ document.addEventListener('DOMContentLoaded', () => {
       toggleNextBtn(false);
       transitionScene(elements.sceneOverview, elements.sceneGallery);
 
-      const targetImg = [...elements.horizontalTrack.querySelectorAll('img')]
-        .find(img => img.src === url);
+      const img = [...elements.horizontalTrack.querySelectorAll('img')]
+        .find(i => i.src === url);
 
-      if (targetImg) targetImg.parentElement.scrollIntoView();
+      if (img) img.scrollIntoView({ behavior: 'smooth', inline: 'center' });
     };
 
     return tile;
   }
 
   function revealMosaicTiles() {
-    if (elements.horizontalTrack && elements.horizontalTrack.children.length === 0) {
+    if (elements.horizontalTrack && !elements.horizontalTrack.children.length) {
       MEMORY_REPOSITORY.forEach(url => {
         const slide = document.createElement('div');
         slide.className = 'horizontal-item';
@@ -265,16 +248,23 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    document.querySelectorAll('.mood-tile').forEach((t, i) => {
-      setTimeout(() => t.classList.add('spill-active'), i * 100);
-    });
+    document.querySelectorAll('.mood-tile')
+      .forEach((t, i) => setTimeout(() => t.classList.add('spill-active'), i * 100));
   }
 
   function initParticleSystem(canvas) {
     if (!canvas) return;
+
     const ctx = canvas.getContext('2d');
-    let w = canvas.width = window.innerWidth,
-        h = canvas.height = window.innerHeight;
+    let w, h;
+
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
 
     const particles = Array.from({ length: 80 }, () => ({
       x: Math.random() * w,
@@ -283,9 +273,10 @@ document.addEventListener('DOMContentLoaded', () => {
       v: Math.random() * 0.5
     }));
 
-    function render() {
+    (function render() {
       ctx.clearRect(0, 0, w, h);
       ctx.fillStyle = "rgba(255,255,255,0.3)";
+
       particles.forEach(p => {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.s, 0, Math.PI * 2);
@@ -293,15 +284,15 @@ document.addEventListener('DOMContentLoaded', () => {
         p.y -= p.v;
         if (p.y < 0) p.y = h;
       });
-      requestAnimationFrame(render);
-    }
 
-    render();
+      requestAnimationFrame(render);
+    })();
   }
 
   function generateBalloons() {
     const container = document.getElementById('balloon-container');
     if (!container) return;
+
     for (let i = 0; i < 15; i++) {
       const b = document.createElement('div');
       b.className = 'balloon';
@@ -314,10 +305,14 @@ document.addEventListener('DOMContentLoaded', () => {
   async function materializeAssets() {
     try {
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      const prompt = "Write 2 short, poetic birthday phrases under 10 words for Janet. No hashtags.";
+      const prompt = "Write 2 short poetic birthday phrases.";
       const result = await model.generateContent(prompt);
-      const text = result.response.text();
-      dynamicPhrases = text.split('\n').filter(l => l.trim().length > 3).slice(0, 2);
+
+      dynamicPhrases = result.response.text()
+        .split('\n')
+        .filter(l => l.trim().length > 3)
+        .slice(0, 2);
+
     } catch {
       dynamicPhrases = [
         "A vault of every reason I love you.",
@@ -328,25 +323,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function initApp() {
     if (elements.moodCollage) {
-      MEMORY_REPOSITORY.forEach(url => {
-        elements.moodCollage.appendChild(createMosaicTile(url));
-      });
+      MEMORY_REPOSITORY.forEach(url =>
+        elements.moodCollage.appendChild(createMosaicTile(url)));
     }
 
     let progress = 0;
 
-    const loaderInt = setInterval(() => {
+    const loader = setInterval(() => {
       progress += 5;
+
       if (elements.progressBar)
         elements.progressBar.style.width = progress + '%';
 
       if (progress >= 100) {
-        clearInterval(loaderInt);
+        clearInterval(loader);
+
         setTimeout(async () => {
           await transitionScene(elements.loader, elements.sceneLocked);
+
           setTimeout(() => {
             if (!hasTransitioned) unlockVaultAction();
           }, 3000);
+
         }, 1000);
       }
     }, 100);
