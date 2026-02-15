@@ -89,30 +89,40 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Smooth horizontal scroll
+  // ✅ UPDATED: SMART SCROLL LOGIC
   if (elements.horizontalTrack) {
     const track = elements.horizontalTrack;
 
     track.addEventListener('wheel', e => {
-      if (e.deltaY !== 0) {
+      // Only horizontal scroll if we are moving more on Y than X (natural scroll feel)
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
         e.preventDefault();
         track.scrollLeft += e.deltaY;
       }
     }, { passive: false });
 
-    let isDown = false, startX, scrollLeft;
+    let isDown = false, startX, startY, scrollLeft;
 
     track.addEventListener('touchstart', e => {
       isDown = true;
       startX = e.touches[0].pageX - track.offsetLeft;
+      startY = e.touches[0].pageY;
       scrollLeft = track.scrollLeft;
-    });
+    }, { passive: true });
 
     track.addEventListener('touchmove', e => {
       if (!isDown) return;
       const x = e.touches[0].pageX - track.offsetLeft;
-      track.scrollLeft = scrollLeft - (x - startX) * 1.5;
-    });
+      const y = e.touches[0].pageY;
+      
+      const walkX = (x - startX);
+      const walkY = (y - startY);
+
+      // If swiping side-to-side, scroll the gallery. If swiping up/down, let the page move.
+      if (Math.abs(walkX) > Math.abs(walkY)) {
+        track.scrollLeft = scrollLeft - walkX * 1.5;
+      }
+    }, { passive: true });
 
     track.addEventListener('touchend', () => isDown = false);
   }
@@ -141,6 +151,15 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   async function transitionScene(from, to) {
+    // Unlock scrolling for the overview scene specifically
+    if (to === elements.sceneOverview) {
+        document.body.style.overflowY = "auto";
+        document.documentElement.style.overflowY = "auto";
+    } else {
+        document.body.style.overflowY = "hidden";
+        document.documentElement.style.overflowY = "hidden";
+    }
+
     if (from) {
       from.classList.remove('visible');
       await cinematicDelay(800);
@@ -343,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           setTimeout(() => {
             if (!hasTransitioned) unlockVaultAction();
-          }, 3000);
+          }, 4000); // Slight delay boost for stability
 
         }, 1000);
       }
