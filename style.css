@@ -59,7 +59,7 @@
   position: fixed;
   bottom: 40px;
   right: 40px;
-  z-index: 999999; /* Massive z-index to stay on top of all scenes */
+  z-index: 999999; 
   padding: 16px 28px;
   background: white;
   color: #111;
@@ -108,21 +108,23 @@
 
 .hidden { display: none !important; }
 
-
 body, html {
   width: 100%;
   height: 100%;
   background-color: var(--bg-color);
   color: var(--text-primary);
   font-family: var(--font-sans);
-  overflow: hidden;
+  /* MODIFIED: Changed from hidden to auto/hidden to allow vertical scroll */
+  overflow-x: hidden;
+  overflow-y: auto;
   user-select: none;
   -webkit-font-smoothing: antialiased;
 
-  /* ✅ FIX — global scroll stability */
-  overscroll-behavior: none;
+  /* MODIFIED: Changed overscroll to auto to allow the page to move */
+  overscroll-behavior: auto;
   touch-action: manipulation;
 }
+
 canvas#ambient-canvas {
   position: fixed;
   inset: 0;
@@ -168,7 +170,9 @@ canvas#ambient-canvas {
 
 .scene {
   display: none;
-  width: 100%; height: 100vh;
+  width: 100%; 
+  /* MODIFIED: Changed from 100vh to min-height so content can be longer */
+  min-height: 100vh;
   position: absolute; top: 0; left: 0;
   opacity: 0;
   transform: scale(1.08) translateY(10px);
@@ -310,7 +314,7 @@ canvas#ambient-canvas {
   position: absolute;
   inset: 0;
   background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
-  z-index: 100; /* Ensuring it's on top of everything */
+  z-index: 100; 
   display: flex;
   align-items: center;
   justify-content: center;
@@ -353,7 +357,7 @@ canvas#ambient-canvas {
 .vault-stage { 
   position: relative; 
   width: 100%; height: 100%; 
-  perspective: 2000px; /* REQUIRED FOR 3D OPENING */
+  perspective: 2000px; 
   display: flex; align-items: center; justify-content: center; 
 }
 
@@ -362,7 +366,7 @@ canvas#ambient-canvas {
   aspect-ratio: 1/1; 
   z-index: 5; 
   transition: transform 1s var(--ease-cinematic);
-  transform-style: preserve-3d; /* REQUIRED FOR 3D OPENING */
+  transform-style: preserve-3d; 
 }
 
 .vault-frame { 
@@ -373,7 +377,7 @@ canvas#ambient-canvas {
   box-shadow: inset 0 0 100px #000, 0 40px 120px rgba(0,0,0,0.95); 
   position: relative; 
   overflow: visible;
-  transform-style: preserve-3d; /* REQUIRED FOR 3D OPENING */
+  transform-style: preserve-3d; 
 }
 
 .vault-door { 
@@ -383,12 +387,12 @@ canvas#ambient-canvas {
   border-radius: 6px; 
   position: absolute; top: 5px; left: 5px; 
   transition: transform 4.5s cubic-bezier(0.5, 0, 0.1, 1); 
-  transform-origin: left center; /* HINGE LOCATION */
+  transform-origin: left center; 
   z-index: 10; 
   display: flex; align-items: center; justify-content: center; 
   overflow: hidden;
   box-shadow: 15px 0 40px rgba(0,0,0,0.6);
-  backface-visibility: hidden; /* HELPS PERFORMANCE */
+  backface-visibility: hidden; 
 }
 
 .vault-door-face {
@@ -506,8 +510,11 @@ canvas#ambient-canvas {
   flex-direction: column; 
   padding: var(--padding-cinematic) var(--padding-standard) 0; 
   justify-content: flex-start; 
-  overflow-y: auto; 
+  /* MODIFIED: Changed from absolute height to scrollable auto */
+  height: auto;
+  overflow-y: visible; 
   scrollbar-width: none;
+  position: relative;
 }
 
 #scene-overview::-webkit-scrollbar { display: none; }
@@ -544,7 +551,7 @@ canvas#ambient-canvas {
   width: 100%; 
   max-width: 1500px; 
   margin: 0 auto;
-  padding-bottom: 5rem; /* Reduced to fit Teddy section closer */
+  padding-bottom: 5rem; 
 }
 
 .mood-tile { 
@@ -575,10 +582,9 @@ canvas#ambient-canvas {
 
 /* ========================================
   [UPDATE] FINAL TEDDY BEAR MESSAGE SPACING 
-  (Now inside Scene Overview)
   ======================================= */
 .final-birthday-message {
-  margin-top: 10rem; /* Spacing from the Gallery/Grid */
+  margin-top: 10rem; 
   margin-bottom: 12rem;
   padding: 4rem 2rem;
   width: 100%;
@@ -616,8 +622,7 @@ canvas#ambient-canvas {
   flex-direction: column;
 }
 
-.
-horizontal-track {
+.horizontal-track {
   flex: 1;
   display: flex;
   overflow-x: auto;
@@ -631,8 +636,6 @@ horizontal-track {
   z-index: 5;
   -webkit-overflow-scrolling: touch;
   pointer-events: all;
-
-  /* ✅ FIX — smooth horizontal drag */
   touch-action: pan-x;
   overscroll-behavior-x: contain;
 }
@@ -763,7 +766,6 @@ horizontal-track {
   .story-card { padding: 2.5rem 1.5rem; width: 90%; }
   .final-birthday-message { margin-top: 5rem; padding: 2rem 1rem; }
   
-  /* Mobile tweak for Next Button */
   .next-trigger {
     bottom: 20px;
     right: 20px;
@@ -771,7 +773,3 @@ horizontal-track {
     font-size: 0.9rem;
   }
 }
-
-/* END OF FRAMEWORK */
-
-
