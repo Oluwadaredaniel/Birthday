@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     sceneMeaning: document.getElementById('scene-meaning'),
     sceneHonest: document.getElementById('scene-honest'),
     sceneOverview: document.getElementById('scene-overview'),
-    sceneGallery: document.getElementById('scene-gallery'), // Added
+    sceneGallery: document.getElementById('scene-gallery'),
     sceneDoubt: document.getElementById('scene-doubt'),
     vaultDoor: document.getElementById('vault-door'),
     vaultWheel: document.getElementById('vault-wheel'),
@@ -50,8 +50,10 @@ document.addEventListener('DOMContentLoaded', () => {
     focusOverlay: document.getElementById('focus-overlay'),
     introText: document.getElementById('intro-text'),
     moodCollage: document.getElementById('mood-collage'),
-    horizontalTrack: document.getElementById('horizontal-track'), // Added
-    closeGallery: document.getElementById('close-gallery'), // Added
+    horizontalTrack: document.getElementById('horizontal-track'),
+    closeGallery: document.getElementById('close-gallery'),
+    heartBtn: document.getElementById('heart-btn'), // Added for Doubt section
+    backToGallery: document.getElementById('back-to-gallery'), // Added for Doubt section
     mainCanvas: document.getElementById('ambient-canvas'),
     globalNext: document.getElementById('next-btn') 
   };
@@ -70,6 +72,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initParticleSystem(elements.mainCanvas);
   generateBalloons();
+
+  // INTERACTIVE BUTTONS (DOUBT SECTION)
+  if (elements.heartBtn) {
+    elements.heartBtn.onclick = () => {
+      elements.heartBtn.style.transform = "scale(1.6) rotate(15deg)";
+      setTimeout(() => elements.heartBtn.style.transform = "scale(1)", 300);
+    };
+  }
+
+  if (elements.backToGallery) {
+    elements.backToGallery.onclick = async () => {
+      await transitionScene(elements.sceneDoubt, elements.sceneOverview);
+      currentSceneIndex = 3; // Reset flow index to Overview
+      toggleNextBtn(true);
+    };
+  }
 
   // HORIZONTAL SCROLL ENABLE
   if (elements.horizontalTrack) {
@@ -215,8 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function revealMosaicTiles() {
     // Populate the horizontal track simultaneously
-    if (elements.horizontalTrack) {
-        elements.horizontalTrack.innerHTML = '';
+    if (elements.horizontalTrack && elements.horizontalTrack.children.length === 0) {
         MEMORY_REPOSITORY.forEach(url => {
             const slide = document.createElement('div');
             slide.className = 'horizontal-item';
