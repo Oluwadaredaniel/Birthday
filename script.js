@@ -1,4 +1,6 @@
-import { GoogleGenerativeAI } from "https://esm.run/@google/genai";
+import * as GenAI from "https://esm.run/@google/generative-ai";
+// Then inside your code, use: 
+// const genAI = new GenAI.GoogleGenerativeAI(API_KEY);
 
 /**
  * ========================================
@@ -268,3 +270,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function cinematicDelay(ms) { return new Promise(res => setTimeout(res, ms)); }
+
