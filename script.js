@@ -9,8 +9,6 @@ import { GoogleGenerativeAI } from "https://cdn.skypack.dev/@google/generative-a
 const API_KEY = "AIzaSyB7YStFu75rVaNjMuFw7X00dtJe_1Psj9s";
 const genAI = new GoogleGenerativeAI(API_KEY);
 
-// ... rest of your code
-
 const MEMORY_REPOSITORY = [
   "https://ik.imagekit.io/kwujelxax/IMG-20260213-WA0026(1).jpg",
   "https://ik.imagekit.io/kwujelxax/IMG-20260213-WA0032(1).jpg",
@@ -44,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     sceneMeaning: document.getElementById('scene-meaning'),
     sceneHonest: document.getElementById('scene-honest'),
     sceneOverview: document.getElementById('scene-overview'),
+    sceneGallery: document.getElementById('scene-gallery'), // Added
     sceneDoubt: document.getElementById('scene-doubt'),
     vaultDoor: document.getElementById('vault-door'),
     vaultWheel: document.getElementById('vault-wheel'),
@@ -51,8 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
     focusOverlay: document.getElementById('focus-overlay'),
     introText: document.getElementById('intro-text'),
     moodCollage: document.getElementById('mood-collage'),
+    horizontalTrack: document.getElementById('horizontal-track'), // Added
+    closeGallery: document.getElementById('close-gallery'), // Added
     mainCanvas: document.getElementById('ambient-canvas'),
-    // FIX: Match the ID in index.html
     globalNext: document.getElementById('next-btn') 
   };
 
@@ -71,17 +71,32 @@ document.addEventListener('DOMContentLoaded', () => {
   initParticleSystem(elements.mainCanvas);
   generateBalloons();
 
+  // HORIZONTAL SCROLL ENABLE
+  if (elements.horizontalTrack) {
+    elements.horizontalTrack.addEventListener('wheel', (e) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        elements.horizontalTrack.scrollLeft += e.deltaY;
+      }
+    });
+  }
+
+  // CLOSE GALLERY HANDLER
+  if (elements.closeGallery) {
+    elements.closeGallery.onclick = () => {
+      transitionScene(elements.sceneGallery, elements.sceneOverview);
+      toggleNextBtn(true);
+    };
+  }
+
   const toggleNextBtn = (show) => {
     if (!elements.globalNext) return;
     if (show) {
-      // Logic for Fade In
       elements.globalNext.style.display = 'flex';
-      void elements.globalNext.offsetWidth; // Trigger reflow
+      void elements.globalNext.offsetWidth; 
       elements.globalNext.classList.add('visible-btn');
     } else {
-      // Logic for Fade Out
       elements.globalNext.classList.remove('visible-btn');
-      // Delay display none until after fade animation
       setTimeout(() => {
         if (!elements.globalNext.classList.contains('visible-btn')) {
             elements.globalNext.style.display = 'none';
@@ -161,11 +176,9 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleNextBtn(true);
   };
 
-  // Safe listener for the Next Button
   if (elements.globalNext) {
     elements.globalNext.addEventListener('click', async (e) => {
       e.preventDefault();
-      // Ensure we haven't reached the last scene
       if (currentSceneIndex < storyFlow.length - 1) {
         const from = storyFlow[currentSceneIndex];
         currentSceneIndex++;
@@ -176,7 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (to === elements.sceneOverview) revealMosaicTiles();
         
-        // Hide button on the very last scene
         if (currentSceneIndex < storyFlow.length - 1) {
           toggleNextBtn(true);
         }
@@ -188,10 +200,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const tile = document.createElement('div');
     tile.className = 'mood-tile';
     tile.innerHTML = `<img src="${url}" loading="lazy">`;
+    
+    // CLICK TO OPEN GALLERY
+    tile.onclick = () => {
+      toggleNextBtn(false);
+      transitionScene(elements.sceneOverview, elements.sceneGallery);
+      // Scroll track to the specific image
+      const targetImg = [...elements.horizontalTrack.querySelectorAll('img')].find(img => img.src === url);
+      if (targetImg) targetImg.parentElement.scrollIntoView();
+    };
+    
     return tile;
   }
 
   function revealMosaicTiles() {
+    // Populate the horizontal track simultaneously
+    if (elements.horizontalTrack) {
+        elements.horizontalTrack.innerHTML = '';
+        MEMORY_REPOSITORY.forEach(url => {
+            const slide = document.createElement('div');
+            slide.className = 'horizontal-item';
+            slide.innerHTML = `<img src="${url}">`;
+            elements.horizontalTrack.appendChild(slide);
+        });
+    }
+
     document.querySelectorAll('.mood-tile').forEach((t, i) => {
       setTimeout(() => t.classList.add('spill-active'), i * 100);
     });
@@ -242,7 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function initApp() {
-    // Fill the collage
     if (elements.moodCollage) {
         MEMORY_REPOSITORY.forEach(url => {
             elements.moodCollage.appendChild(createMosaicTile(url));
@@ -257,7 +289,6 @@ document.addEventListener('DOMContentLoaded', () => {
         clearInterval(loaderInt);
         setTimeout(async () => {
           await transitionScene(elements.loader, elements.sceneLocked);
-          // Auto-unlock vault after 3 seconds for Janet
           setTimeout(() => { if (!hasTransitioned) unlockVaultAction(); }, 3000);
         }, 1000);
       }
@@ -270,5 +301,3 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function cinematicDelay(ms) { return new Promise(res => setTimeout(res, ms)); }
-
-
