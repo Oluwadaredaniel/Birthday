@@ -1,6 +1,4 @@
-import * as GenAI from "https://esm.run/@google/generative-ai";
-// Then inside your code, use: 
-// const genAI = new GenAI.GoogleGenerativeAI(API_KEY);
+import { GoogleGenerativeAI } from "https://cdn.skypack.dev/@google/generative-ai";
 
 /**
  * ========================================
@@ -10,6 +8,8 @@ import * as GenAI from "https://esm.run/@google/generative-ai";
 
 const API_KEY = "AIzaSyB7YStFu75rVaNjMuFw7X00dtJe_1Psj9s";
 const genAI = new GoogleGenerativeAI(API_KEY);
+
+// ... rest of your code
 
 const MEMORY_REPOSITORY = [
   "https://ik.imagekit.io/kwujelxax/IMG-20260213-WA0026(1).jpg",
@@ -270,4 +270,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function cinematicDelay(ms) { return new Promise(res => setTimeout(res, ms)); }
+
 
